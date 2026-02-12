@@ -1,20 +1,15 @@
 import { useState } from 'react'
-import { useEffect } from 'react'
 import { crearTurno, editarTurno, borrarTurno, cancelarTurno } from "../../helpers/apiTurnos.js";
 import { Button } from 'react-bootstrap'
 import CrearTurno from '../turnos/CrearTurno.jsx';
 import Table from 'react-bootstrap/Table'
 import Swal from 'sweetalert2'
+import { useEffect } from "react";
+import { obtenerTurnos } from "../../helpers/apiTurnos.js";
+
 
 const TurnosList = () => {
-
-    const [turnos, setTurnos] = useState(() => {
-        const turnosGuardados = localStorage.getItem("turnos")
-        return turnosGuardados ? JSON.parse(turnosGuardados) : []
-    });
-    const guardarEnLocalStorage = (turnosActualizados) => {
-        localStorage.setItem("turnos", JSON.stringify(turnosActualizados));
-    }
+    const [turnos, setTurnos] = useState([]);
     const [mode, setMode] = useState("crear")
     const [show, setShow] = useState(false)
     const [turnoEdit, setTurnoEdit] = useState(null)
@@ -44,8 +39,20 @@ const TurnosList = () => {
         return "Cancelado";
     };
 
+    useEffect(() => {
+        const fetchTurnos = async () => {
+            const data = await obtenerTurnos();
+            setTurnos(data);
+        };
+
+        fetchTurnos();
+    }, []);
+
+
 
     const handleDelete = async (turno) => {
+        console.log("Turno a borrar:", turno);
+
         const result = await Swal.fire({
             title: "¿Eliminar turno?",
             text: "Esta acción no se puede deshacer",
@@ -61,7 +68,7 @@ const TurnosList = () => {
             const exito = await borrarTurno(turno);
             if (exito) {
 
-                const nuevosTurnos = turnos.filter(t => t.id !== turno.id);
+                const nuevosTurnos = turnos.filter(t => t._id !== turno._id);
                 setTurnos(nuevosTurnos);
                 localStorage.setItem("turnos", JSON.stringify(nuevosTurnos));
 
@@ -181,29 +188,30 @@ const TurnosList = () => {
                 mode={mode}
                 turnoEdit={turnoEdit}
                 onSave={async (nuevoTurno) => {
+
                     if (mode === "crear") {
                         const turnoGuardado = await crearTurno(nuevoTurno);
                         setTurnos([...turnos, turnoGuardado]);
-                        guardarEnLocalStorage([...turnos, turnoGuardado]);
-                        console.log("Turno creado:", turnoGuardado);
+                        console.log("Turno creado:", turnoGuardado)
+                        return true;
 
                     } else if (mode === "editar" && turnoEdit) {
                         const turnoActualizado = await editarTurno({
                             ...nuevoTurno,
-                            id: turnoEdit.id
+                            _id: turnoEdit._id
                         });
-                        setTurnos(turnos.map(t =>
-                            t.id === turnoEdit.id ? turnoActualizado : t
-                        ));
-                        guardarEnLocalStorage(turnos.map(t =>
-                            t.id === turnoEdit.id ? turnoActualizado : t
-                        ));
+                        setTurnos(prev =>
+                            prev.map(t =>
+                                t._id === turnoEdit._id ? turnoActualizado : t
+                            )
+                        );
                         console.log("Turno actualizado:", turnoActualizado);
-
+                        return true
                     }
                 }}
                 pacientesMock={pacientes}
                 medicosMock={medicos}
+                turnos={turnos}
             />
             {isUser && (
                 <Button

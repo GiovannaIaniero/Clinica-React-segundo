@@ -22,7 +22,7 @@ export const crearTurno = async (turno) => {
 
 export const editarTurno = async (turno) => {
   try {
-    const respuesta = await fetch(`${turnosBackend}/${turno.id}`, {
+    const respuesta = await fetch(`${turnosBackend}/${turno._id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -42,12 +42,14 @@ export const editarTurno = async (turno) => {
 
 export const borrarTurno = async (turno) => {
   try {
-    const respuesta = await fetch(`${turnosBackend}/${turno.id}`, {
+    console.log(turno);
+    
+    const respuesta = await fetch(`${turnosBackend}/${turno._id}`, {
       method: "DELETE",
     });
 
     if (!respuesta.ok) {
-      throw new Error("Error al editar turno");
+      throw new Error("Error al borrar turno");
     }
 
     return true;    
@@ -71,5 +73,20 @@ export const cancelarTurno = async (turno, nuevoEstado) => {
 
   } catch (error) {
     console.error("Error:", error);
+  }
+};
+
+export const obtenerTurnos = async () => {
+  try {
+    const respuesta = await fetch(turnosBackend);
+
+    if (!respuesta.ok) {
+      throw new Error("Error al obtener turnos");
+    }
+
+    return await respuesta.json();
+  } catch (error) {
+    console.error("Error:", error);
+    return [];
   }
 };
