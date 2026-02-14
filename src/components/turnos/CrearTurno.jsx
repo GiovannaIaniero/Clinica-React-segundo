@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
-import { validarFinDeSemana, validarTurnoDuplicado } from '../../helpers/ValidacionesTurnos';
+import { validarTurnoCompleto } from '../../helpers/ValidacionesTurnos';
 
 const CrearTurno = ({
     show,
@@ -29,17 +29,14 @@ const CrearTurno = ({
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (validarTurnoDuplicado(turnos, form, turnoEdit)) {
-            setError("Ese médico ya tiene un turno en ese horario.");
-            return false;
-        }
+        const mensajeError = validarTurnoCompleto(turnos, form, turnoEdit);
 
-        setError(""); // limpiar si todo está ok
-
-        if (validarFinDeSemana(form.fecha)) {
-            setError("No se atiende fines de semana.");
+        if (mensajeError) {
+            setError(mensajeError);
             return;
         }
+
+        setError("");
 
         const success = await onSave(form);
 
@@ -170,7 +167,7 @@ const CrearTurno = ({
                         <option value="Reprogramado">Reprogramado</option>
                     </select>
                     {error && (
-                        <div className="alert alert-danger py-2">
+                        <div className="alert alert-danger py-2 my-2">
                             {error}
                         </div>
                     )}
