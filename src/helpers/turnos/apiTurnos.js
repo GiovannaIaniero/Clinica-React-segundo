@@ -42,8 +42,7 @@ export const editarTurno = async (turno) => {
 
 export const borrarTurno = async (turno) => {
   try {
-    console.log(turno);
-    
+  
     const respuesta = await fetch(`${turnosBackend}/${turno._id}`, {
       method: "DELETE",
     });

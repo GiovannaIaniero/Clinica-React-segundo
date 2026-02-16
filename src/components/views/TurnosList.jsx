@@ -1,12 +1,11 @@
 import { useState } from 'react'
-import { crearTurno, editarTurno, borrarTurno, cancelarTurno } from "../../helpers/apiTurnos.js";
+import { crearTurno, editarTurno, borrarTurno, cancelarTurno, obtenerTurnosPaginados } from "../../helpers/turnos/apiTurnos.js";
 import { Button } from 'react-bootstrap'
 import CrearTurno from '../turnos/CrearTurno.jsx';
 import PaginacionTurnos from '../turnos/Paginacion.jsx';
 import Table from 'react-bootstrap/Table'
 import Swal from 'sweetalert2'
 import { useEffect } from "react";
-import { obtenerTurnosPaginados } from "../../helpers/apiTurnos.js";
 
 const TurnosList = () => {
     const [turnos, setTurnos] = useState([]);
