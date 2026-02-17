@@ -15,6 +15,7 @@ import HistoriaClinica from './components/historiaClinica/HistoriaClinica.jsx'
 import ItemMedico from './components/views/crudMedico/ItemMedico.jsx'
 import Error404 from './components/views/Error404.jsx'
 import ItemPacientes from './components/views/Pacientes/ItemPacientes.jsx'
+import Pago from './components/turnos/Pagos.jsx'
 
 
 
@@ -45,6 +46,7 @@ function App() {
             <Route path='/login' element={<Login onLogin={setIsAdmin} />} />
             <Route path='/historiaClinica' element={currentUser?.role === "medico" ? <HistoriaClinica /> : <Navigate to="/login" />} />
             <Route path='/registroMedico' element={<RegistroMedico />} />
+            <Route path="pago" element={currentUser?.role === "user" ? <Pago /> : <Navigate to="/login" />} />
 
             <Route path='*' element={<Error404 />} />
           </Routes>

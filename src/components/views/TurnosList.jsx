@@ -3,6 +3,7 @@ import { crearTurno, editarTurno, borrarTurno, cancelarTurno, obtenerTurnosPagin
 import { Button } from 'react-bootstrap'
 import CrearTurno from '../turnos/CrearTurno.jsx';
 import PaginacionTurnos from '../turnos/Paginacion.jsx';
+import Pagos from '../turnos/Pagos.jsx';
 import Table from 'react-bootstrap/Table'
 import Swal from 'sweetalert2'
 import { useEffect } from "react";
@@ -226,14 +227,27 @@ const TurnosList = () => {
                 turnos={turnos}
             />
             {isUser && (
-                <Button
-                    as="a"
-                    href="https://mail.google.com/mail/?view=cm&fs=1&to=tomasignacioponce17@gmail.com"
-                    variant="outline-secondary"
-                    target="_blank"
-                >
-                    Contactar soporte
-                </Button>
+                <>
+                    <Button
+                        variant="success"
+                        onClick={() => {
+                            setMode("crear");
+                            setTurnoEdit(null);
+                            setShow(true);
+                        }}
+                    >
+                        Pedir Turno
+                        <i className="bi bi-calendar-plus me-2 ms-2"></i>
+                    </Button>
+                    <Button
+                        as="a"
+                        href="https://mail.google.com/mail/?view=cm&fs=1&to=tomasignacioponce17@gmail.com"
+                        variant="outline-secondary ms-2"
+                        target="_blank"
+                    >
+                        Contactar soporte
+                    </Button>
+                </>
             )}
 
             {isAdmin && (
