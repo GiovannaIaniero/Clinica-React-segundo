@@ -1,0 +1,13 @@
+{
+  "turnos": [
+    {
+      "id": "02de",
+      "pacienteNombre": "Maria Gomez",
+      "medicoNombre": "Dr. Brown",
+      "fecha": "2025-12-16",
+      "hora": "00:56",
+      "motivoConsulta": " ",
+      "estado": "Cancelado por el paciente"
+    }
+  ]
+}

@@ -5,6 +5,11 @@
   text-align: center;
 }
 
+body{
+  font-family: 'Roboto', sans-serif !important;
+}
+
+
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -39,4 +44,44 @@
 
 .read-the-docs {
   color: #888;
+}
+
+.input-editando {
+  background: linear-gradient(90deg, #fff3cd, #ffeeba);
+  border-color: #ffca2c !important;
+  transition: 0.3s ease;
+}
+
+.lista-div{
+  background-color: #65c4a4ff ;
+  border-radius: 10px;
+}
+
+.div-principal{
+display: grid;
+grid-template-rows: auto 1fr auto;
+min-height: 100vh;
+} 
+
+
+
+
+#registroPacientes , #registroMedico {
+  background-color: #aad69d;
+  padding: 1rem;
+  border-radius: 5%;
+}
+
+#registroPacientes  .containerLabelControl {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+
+
+#registroMedico .containerLabelControl {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
 }

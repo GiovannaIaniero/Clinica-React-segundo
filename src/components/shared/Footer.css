@@ -1,0 +1,80 @@
+footer {
+    background-color: #ebedef92;
+    color: black;
+    padding: 20px 0;
+    margin-top: 60px;
+
+}
+
+.footer-column {
+    text-align: left;
+    margin: 0;
+    font-style: Roboto;
+    
+}
+
+.footer-nav {
+    gap: 1px;
+    color: #aad69d;
+    text-decoration: none;
+}
+
+.footer-link {
+    padding: 0;
+    margin: 2px 0;
+    font-size: 14px;
+    color: #fbfbfc;
+    text-decoration: none;
+}
+
+footer h4 {
+    font-size: 20px;
+    font-style: Roboto;
+    margin-bottom: 10px;
+    
+}
+
+footer p {
+    margin: 0;
+    opacity: 0.8;
+    font-style: Roboto;
+    color: rgb(67, 64, 64);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-style: italic;
+}
+
+footer strong {
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.footer a {
+    color: #6ec8bd;
+    text-decoration: none;
+    font-size: 15px;
+    margin: 4px 0;
+    padding: 0;
+    font-style: Roboto;
+
+}
+
+footer a:hover {
+    color: #ffffffcc;
+    transform: translateX(3px);
+    transition: 0.2s ease;
+}
+
+img {
+    width: 180px;
+    height: 180px;;
+}
+
+.footer-nav .nav-link {
+    margin: 1px;
+}
+
+.footer-container {
+    padding: 0;
+    margin: 0;
+    max-width: 100%;
+}
