@@ -4,6 +4,7 @@ import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import { validarTurnoCompleto } from '../../helpers/turnos/ValidacionesTurnos';
 import { useNavigate } from "react-router-dom";
+import { getRoleFromToken } from '../../helpers/login/apiLogin.js';
 
 const CrearTurno = ({
     show,
@@ -19,11 +20,12 @@ const CrearTurno = ({
 
     const [error, setError] = useState("");
     const navigate = useNavigate();
-    const currentUser = JSON.parse(localStorage.getItem("currentUser"))
-    const isAdmin = currentUser?.role === "admin"
-    const isUser = currentUser?.role === "user"
-    const isMedico = currentUser?.role === "medico"
-    const isMyTurn = currentUser?.id === turnoEdit?.pacienteId
+
+    const role = getRoleFromToken();
+
+    const isAdmin = role === "admin"
+    const isUser = role === "user"
+    const isMedico = role === "medico"
 
     useEffect(() => {
         if (mode === "editar" && turnoEdit) {

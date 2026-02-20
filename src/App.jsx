@@ -16,6 +16,7 @@ import ItemMedico from './components/views/crudMedico/ItemMedico.jsx'
 import Error404 from './components/views/Error404.jsx'
 import ItemPacientes from './components/views/Pacientes/ItemPacientes.jsx'
 import Pago from './components/turnos/Pagos.jsx'
+import { getRoleFromToken } from './helpers/login/apiLogin.js';
 
 
 
@@ -23,13 +24,10 @@ function App() {
   const [isAdmin, setIsAdmin] = useState(false)
   const currentUser = JSON.parse(localStorage.getItem("currentUser"))
 
-  if (currentUser?.role === "admin") {
-    console.log("El usuario es un admin")
-  } else if (currentUser?.role === "user") {
-    console.log("El usuario es un paciente")
-  } else if (currentUser?.role === "medico") {
-    console.log("El usuario es un médico")
-  }
+  const role = getRoleFromToken();
+
+
+
   return (
     <div className='div-principal'>
       <BrowserRouter>
@@ -41,12 +39,12 @@ function App() {
             <Route path='' element={<Home />} />
             <Route path='/' element={<Home />} />
             <Route path='/registrarPaciente' element={<RegistrarPaciente />} />
-            <Route path='/guardia-medica' element={currentUser?.role === "medico" || currentUser?.role === "admin" ? <GuardiaMedica /> : <Navigate to="/login" />} />
+            <Route path='/guardia-medica' element={role === "medico" || role === "admin" ? <GuardiaMedica /> : <Navigate to="/login" />} />
             <Route path='/turnos' element={<TurnosList />} />
             <Route path='/login' element={<Login onLogin={setIsAdmin} />} />
-            <Route path='/historiaClinica' element={currentUser?.role === "medico" ? <HistoriaClinica /> : <Navigate to="/login" />} />
+            <Route path='/historiaClinica' element={role === "medico" ? <HistoriaClinica /> : <Navigate to="/login" />} />
             <Route path='/registroMedico' element={<RegistroMedico />} />
-            <Route path="pago" element={currentUser?.role === "user" ? <Pago /> : <Navigate to="/login" />} />
+            <Route path="pago" element={role === "paciente" ? <Pago /> : <Navigate to="/login" />} />
 
             <Route path='*' element={<Error404 />} />
           </Routes>
