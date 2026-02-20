@@ -3,12 +3,9 @@ import { Link, NavLink, useNavigate } from "react-router";
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import { login } from "../../helpers/login/apiLogin.js";
 
 const { VITE_ADMIN_USER, VITE_ADMIN_PASS } = import.meta.env;
-
-const adminEmail = VITE_ADMIN_USER;
-const adminPass = VITE_ADMIN_PASS;
-
 
 const Login = ({ onLogin }) => {
   const { register, handleSubmit, formState: { errors } } = useForm()
@@ -27,44 +24,34 @@ const Login = ({ onLogin }) => {
     }
   }
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
+    try {
+        const result = await login(data.email, data.contraseña);
+        console.log(data.email);
+        console.log(data.contraseña);
+        
+        if (result.error) {
+          setLoginError(result.error);
+          return;
+        }
 
+        // Guardar el token y el usuario en localStorage
+        localStorage.setItem("token", result.token);
 
-    if (data.email === adminEmail && data.password === adminPass) {
-      localStorage.setItem("currentUser", JSON.stringify({ email: data.email, role: "admin" }));
-      onLogin?.(true);
-      navigate("/turnos");
-      return;
-    }
+        onLogin?.(result.role === "admin");
+        console.log(result.role);
+        
+        // Redirigir según rol
+        if (result.role === "admin") {
+          navigate("/turnos");
+        } else {
+          navigate("/");
+        }
 
-    const pacientes = JSON.parse(localStorage.getItem("pacientesKey")) || [];
-    const medicos = JSON.parse(localStorage.getItem("agendaMedicoKey")) || [];
-    const users = [...pacientes, ...medicos];
-
-    const emailInput = data.email.trim();
-    const passInput = data.password.trim();
-
-    let userFound = null;
-    for (const u of users) {
-      if (u.email && u.email === emailInput && (u.contraseña || u.password) === passInput) {
-        userFound = { ...u, role: "user" };
-        break;
+      } catch (error) {
+        console.error(error);
+        setLoginError("Error al iniciar sesión");
       }
-      if (u.email_medico && u.email_medico === emailInput && (u.contraseña || u.password) === passInput) {
-        userFound = { ...u, role: "medico" };
-        break;
-      }
-    }
-
-    if (!userFound) {
-      setLoginError("Email o contraseña incorrectos");
-      return;
-    }
-
-    localStorage.setItem("currentUser", JSON.stringify(userFound));
-    onLogin?.(false);
-    navigate("/");
-    window.location.reload();
   };
 
   return (
@@ -103,7 +90,7 @@ const Login = ({ onLogin }) => {
                 <Form.Control
                   type="password"
                   placeholder="Ingresa una contraseña"
-                  {...register("password", {
+                  {...register("contraseña", {
                     required: "La contraseña es obligatoria",
                     minLength: {
                       value: 6,
