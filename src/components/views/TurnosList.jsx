@@ -6,19 +6,22 @@ import PaginacionTurnos from '../turnos/Paginacion.jsx';
 import Table from 'react-bootstrap/Table'
 import Swal from 'sweetalert2'
 import { useEffect } from "react";
+import { get } from 'react-hook-form';
+import { getRoleFromToken } from '../../helpers/login/apiLogin.js';
 
 const TurnosList = () => {
     const [turnos, setTurnos] = useState([]);
     const [mode, setMode] = useState("crear")
     const [show, setShow] = useState(false)
     const [turnoEdit, setTurnoEdit] = useState(null)
-    const currentUser = JSON.parse(localStorage.getItem("currentUser"))
     const [paginaActual, setPaginaActual] = useState(1);
     const [cantPaginas, setCantPaginas] = useState(1);
-    const isAdmin = currentUser?.role === "admin"
-    const isUser = currentUser?.role === "user"
-    const isMedico = currentUser?.role === "medico"
-    const isMyTurn = currentUser?.id === turnoEdit?.pacienteId
+
+    const role = getRoleFromToken();
+
+    const isAdmin = role === "admin"
+    const isUser = role === "user"
+    const isMedico = role === "medico"
 
 
     const pacientes = [
@@ -35,8 +38,10 @@ const TurnosList = () => {
     ];
 
     const getNuevoEstado = () => {
-        if (currentUser?.role === "medico") return "Cancelado por el médico";
-        if (currentUser?.role === "user") return "Cancelado por el paciente";
+        const role = getRoleFromToken();
+
+        if (role === "medico") return "Cancelado por el médico";
+        if (role === "user") return "Cancelado por el paciente";
         return "Cancelado";
     };
 
@@ -118,8 +123,10 @@ const TurnosList = () => {
             if (exito) {
 
                 const getNuevoEstado = () => {
-                    if (currentUser?.role === "medico") return "Cancelado por el médico";
-                    if (currentUser?.role === "user") return "Cancelado por el paciente";
+                    const role = getRoleFromToken();
+
+                    if (role === "medico") return "Cancelado por el médico";
+                    if (role === "user") return "Cancelado por el paciente";
                     return "Cancelado";
                 };
 

@@ -3,7 +3,7 @@ import { Link, NavLink, useNavigate } from "react-router";
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { login } from "../../helpers/login/apiLogin.js";
+import { login, getRoleFromToken } from "../../helpers/login/apiLogin.js";
 
 const { VITE_ADMIN_USER, VITE_ADMIN_PASS } = import.meta.env;
 
@@ -24,35 +24,32 @@ const Login = ({ onLogin }) => {
     }
   }
 
-  const onSubmit = async (data) => {
-    try {
-        const result = await login(data.email, data.contraseña);
-        console.log(data.email);
-        console.log(data.contraseña);
-        
-        if (result.error) {
-          setLoginError(result.error);
-          return;
-        }
+ const onSubmit = async (data) => {
+  try {
+    const result = await login(data.email, data.contraseña);
 
-        // Guardar el token y el usuario en localStorage
-        localStorage.setItem("token", result.token);
+    if (result.error) {
+      setLoginError(result.error);
+      return;
+    }
 
-        onLogin?.(result.role === "admin");
-        console.log(result.role);
-        
-        // Redirigir según rol
-        if (result.role === "admin") {
-          navigate("/turnos");
-        } else {
-          navigate("/");
-        }
+    // Obtener rol desde el token
+    const role = getRoleFromToken();
+    
+    onLogin?.(role === "admin");
 
-      } catch (error) {
-        console.error(error);
-        setLoginError("Error al iniciar sesión");
-      }
-  };
+    // Redirigir según rol REAL del token
+    if (role === "admin") {
+      navigate("/turnos");
+    } else {
+      navigate("/");
+    }
+
+  } catch (error) {
+    console.error(error);
+    setLoginError("Error al iniciar sesión");
+  }
+};
 
   return (
     <Card className="shadow p-3 mb-5 bg-body rounded card-login">
@@ -62,10 +59,10 @@ const Login = ({ onLogin }) => {
             {rol === "Paciente" && (
               <h1 className="text-center mb-4">Ingreso de paciente</h1>
             )}
-            {rol === "Medico" &&(
+            {rol === "Medico" && (
               <h1 className="text-center mb-4">Ingreso de profesional</h1>
             )}
-            {rol === undefined &&(
+            {rol === undefined && (
               <h1 className="text-center mb-4">Ingreso</h1>
             )}
             <Form onSubmit={handleSubmit(onSubmit)}>

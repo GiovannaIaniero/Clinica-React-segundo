@@ -13,11 +13,22 @@ export const login = async (email, contraseña) => {
     if (!respuesta.ok) {
       throw new Error(data.mensaje || "Error al iniciar sesión");
     }
-    console.log(data);
     
     return data // data.token, data.user, etc.
   } catch (error) {
     console.error(error);
     return { error: error.message };
+  }
+};
+
+export const getRoleFromToken = () => {
+  const token = localStorage.getItem("token");
+  if (!token) return null;
+
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.role;
+  } catch {
+    return null;
   }
 };
