@@ -20,7 +20,7 @@ const TurnosList = () => {
     const role = getRoleFromToken();
 
     const isAdmin = role === "admin"
-    const isUser = role === "user"
+    const isUser = role === "paciente"
     const isMedico = role === "medico"
 
 
@@ -352,7 +352,7 @@ const TurnosList = () => {
                                                 <i className="bi bi-check-all"></i>
                                             </Button>
                                         )}
-                                        {(isUser && isMyTurn) || isMedico ? (
+                                        {(isUser) || isMedico ? (
                                             <Button
                                                 variant="danger"
                                                 disabled={t.estado === getNuevoEstado()}
