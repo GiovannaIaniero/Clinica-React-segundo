@@ -1,17 +1,20 @@
 import { Navbar, Nav, NavDropdown, Container } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { getRoleFromToken } from '../../helpers/login/apiLogin.js';
+import { useNavigate } from "react-router";
 
 
 export default function NavbarClinica() {
-  const role = JSON.parse(localStorage.getItem("currentUser"))?.role;
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem("currentUser")));
-
+  const navigate = useNavigate();
   const cerrarSesion = () => {
-    localStorage.removeItem("currentUser");
-    setUser(null);
-    window.location.reload();
+    localStorage.removeItem("token");
+    navigate("/login");
   };
+  
+
+  const role = getRoleFromToken();
+  console.log("Rol del usuario:", role);
   
 
   return (

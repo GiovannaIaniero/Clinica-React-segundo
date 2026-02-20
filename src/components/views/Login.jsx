@@ -35,6 +35,8 @@ const Login = ({ onLogin }) => {
 
     // Obtener rol desde el token
     const role = getRoleFromToken();
+
+    localStorage.setItem("token", result.token);
     
     onLogin?.(role === "admin");
 
