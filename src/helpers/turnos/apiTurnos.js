@@ -26,6 +26,7 @@ export const editarTurno = async (turno) => {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${localStorage.getItem("token")}`
       },
       body: JSON.stringify(turno),
     });
@@ -42,16 +43,20 @@ export const editarTurno = async (turno) => {
 
 export const borrarTurno = async (turno) => {
   try {
-  
+
     const respuesta = await fetch(`${turnosBackend}/${turno._id}`, {
       method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${localStorage.getItem("token")}`
+      }
     });
 
     if (!respuesta.ok) {
       throw new Error("Error al borrar turno");
     }
 
-    return true;    
+    return true;
   } catch (error) {
     return false;
   }
