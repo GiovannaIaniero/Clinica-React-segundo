@@ -41,7 +41,8 @@ const Pago = () => {
         const response = await iniciarPagoTurno(datosTurno);
 
         if (response?.init_point) {
-          window.location.href = response.init_point;
+          window.open(response.init_point, "_blank");
+          navigate("/"); // o donde quieras redirigir después de iniciar pago
         } else {
           throw new Error("Error al iniciar pago");
         }
@@ -74,6 +75,7 @@ const Pago = () => {
           className="btn btn-success mt-3"
           onClick={handleConfirmarPago}
           disabled={loading}
+
         >
           {loading ? "Procesando..." : "Confirmar y Pagar"}
         </button>

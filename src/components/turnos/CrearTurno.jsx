@@ -5,6 +5,7 @@ import Form from 'react-bootstrap/Form';
 import { validarTurnoCompleto } from '../../helpers/turnos/ValidacionesTurnos';
 import { useNavigate } from "react-router-dom";
 import { getRoleFromToken } from '../../helpers/login/apiLogin.js';
+import { listarDoctores } from '../../helpers/registroDoctores/apiDoctores.js';
 
 const CrearTurno = ({
     show,
@@ -15,19 +16,38 @@ const CrearTurno = ({
     pacientesMock,
     medicosMock,
     turnos,
-    nuevoTurno
 }) => {
 
     const [error, setError] = useState("");
     const navigate = useNavigate();
+    const [medicos, setMedicos] = useState([]);
 
     const role = getRoleFromToken();
 
     const isAdmin = role === "admin"
-    const isUser = role === "user"
+    const isUser = role === "paciente"
     const isMedico = role === "medico"
 
     useEffect(() => {
+
+        const cargarMedicos = async () => {
+            try {
+                const data = await listarDoctores();
+
+                const medicosFormateados = data.map(m => ({
+                    id: m._id,
+                    nombre: m.nombre_y_apellido
+                }));
+
+                setMedicos(medicosFormateados);
+
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        cargarMedicos();
+
         if (mode === "editar" && turnoEdit) {
             setForm(turnoEdit);
         } else if (mode === "crear") {
@@ -143,8 +163,10 @@ const CrearTurno = ({
                         required
                     >
                         <option value="">Seleccionar médico</option>
-                        {medicosMock.map(m => (
-                            <option key={m.id} value={m.nombre}>{m.nombre}</option>
+                        {medicos.map(m => (
+                            <option key={m.id} value={m.nombre}>
+                                {m.nombre}
+                            </option>
                         ))}
                     </select>
 

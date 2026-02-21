@@ -119,25 +119,28 @@ const TurnosList = () => {
         });
 
         if (result.isConfirmed) {
-            const exito = await cancelarTurno(turno, getNuevoEstado());
+
+            const getNuevoEstado = () => {
+                const role = getRoleFromToken();
+                console.log("Role en getNuevoEstado:", role);
+                if (role === "medico") return "Cancelado por el médico";
+                if (role === "paciente") return "Cancelado por el paciente";
+                return "Cancelado";
+            };
+
+            const nuevoEstado = getNuevoEstado();
+
+            const exito = await cancelarTurno(turno, nuevoEstado);
+
             if (exito) {
 
-                const getNuevoEstado = () => {
-                    const role = getRoleFromToken();
-
-                    if (role === "medico") return "Cancelado por el médico";
-                    if (role === "user") return "Cancelado por el paciente";
-                    return "Cancelado";
-                };
-
                 const nuevosTurnos = turnos.map(t =>
-                    t.id === turno.id ? { ...t, estado: getNuevoEstado() } : t
+                    t._id === turno._id
+                        ? { ...t, estado: nuevoEstado }
+                        : t
                 );
 
                 setTurnos(nuevosTurnos);
-                localStorage.setItem("turnos", JSON.stringify(nuevosTurnos));
-
-
 
                 Swal.fire({
                     title: "Cancelado",
@@ -146,6 +149,7 @@ const TurnosList = () => {
                     timer: 2000,
                     showConfirmButton: false
                 });
+
             } else {
                 Swal.fire({
                     title: "Error",
@@ -173,7 +177,7 @@ const TurnosList = () => {
             if (exito) {
 
                 const nuevosTurnos = turnos.map(t =>
-                    t.id === turno.id ? { ...t, estado: "Atendido" } : t
+                    t._id === turno._id ? { ...t, estado: "Atendido" } : t
                 );
 
                 setTurnos(nuevosTurnos);
@@ -355,11 +359,12 @@ const TurnosList = () => {
                                         {(isUser) || isMedico ? (
                                             <Button
                                                 variant="danger"
-                                                disabled={t.estado === getNuevoEstado()}
+                                                disabled={t.estado.toLowerCase().includes("cancelado")}
                                                 onClick={() => {
                                                     setMode(getNuevoEstado());
                                                     setTurnoEdit(t);
                                                     handleCancel(t);
+                                                    
                                                 }}
                                             >
                                                 <i className="bi bi-x-circle-fill"></i>
