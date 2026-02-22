@@ -6,6 +6,7 @@ import { validarTurnoCompleto } from '../../helpers/turnos/ValidacionesTurnos';
 import { useNavigate } from "react-router-dom";
 import { getRoleFromToken } from '../../helpers/login/apiLogin.js';
 import { listarDoctores } from '../../helpers/registroDoctores/apiDoctores.js';
+import { listarPacientes } from '../../helpers/pacientes/apiPacientes.js';
 
 const CrearTurno = ({
     show,
@@ -13,20 +14,15 @@ const CrearTurno = ({
     onSave,
     mode,
     turnoEdit,
-    pacientesMock,
-    medicosMock,
     turnos,
 }) => {
 
     const [error, setError] = useState("");
     const navigate = useNavigate();
     const [medicos, setMedicos] = useState([]);
-
+    const [pacientes, setPacientes] = useState([]);
     const role = getRoleFromToken();
-
-    const isAdmin = role === "admin"
     const isUser = role === "paciente"
-    const isMedico = role === "medico"
 
     useEffect(() => {
 
@@ -34,7 +30,7 @@ const CrearTurno = ({
             try {
                 const data = await listarDoctores();
 
-                const medicosFormateados = data.map(m => ({
+                const medicosFormateados = data.filter(m => m.role !== "admin").map(m => ({
                     id: m._id,
                     nombre: m.nombre_y_apellido
                 }));
@@ -47,6 +43,28 @@ const CrearTurno = ({
         };
 
         cargarMedicos();
+
+        const cargarPacientes = async () => {
+            try {
+                const data = await listarPacientes();
+
+                const pacientesFormateados = data.filter(p => p.role !== "admin").map(p => ({
+                    id: p._id,
+                    nombre: p.nombre_y_apellido
+                }));
+
+                setPacientes(pacientesFormateados);
+
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        cargarPacientes();
+
+        console.log(cargarPacientes);
+        
+
 
         if (mode === "editar" && turnoEdit) {
             setForm(turnoEdit);
@@ -154,11 +172,11 @@ const CrearTurno = ({
                         <select
                             value={form.pacienteNombre}
                             onChange={e => setForm({ ...form, pacienteNombre: e.target.value })}
-                            className="form-select"
+                            className='form-select'
                             required
                         >
                             <option value="">Seleccionar paciente</option>
-                            {pacientesMock.map(p => (
+                            {pacientes.map(p => (
                                 <option key={p.id} value={p.nombre}>
                                     {p.nombre}
                                 </option>

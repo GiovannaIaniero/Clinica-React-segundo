@@ -48,3 +48,9 @@ export const borrarPaciente = async (id) => {
   });
   return res.ok;
 };
+
+export const listarPacientes = async () => {
+  const respuesta = await fetch(pacientesBackend);
+  if (!respuesta.ok) throw new Error("Error al listar pacientes");
+  return await respuesta.json();
+};

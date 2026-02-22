@@ -6,7 +6,6 @@ import PaginacionTurnos from '../turnos/Paginacion.jsx';
 import Table from 'react-bootstrap/Table'
 import Swal from 'sweetalert2'
 import { useEffect } from "react";
-import { get } from 'react-hook-form';
 import { getRoleFromToken } from '../../helpers/login/apiLogin.js';
 
 const TurnosList = () => {
