@@ -30,13 +30,6 @@ const TurnosList = () => {
         { id: 3, nombre: "Carlos Lopez" }
     ];
 
-
-    const medicos = [
-        { id: 1, nombre: "Dr. Smith" },
-        { id: 2, nombre: "Dra. Johnson" },
-        { id: 3, nombre: "Dr. Brown" }
-    ];
-
     const getNuevoEstado = () => {
         const role = getRoleFromToken();
 
@@ -87,7 +80,6 @@ const TurnosList = () => {
 
                 const nuevosTurnos = turnos.filter(t => t._id !== turno._id);
                 setTurnos(nuevosTurnos);
-                localStorage.setItem("turnos", JSON.stringify(nuevosTurnos));
 
                 Swal.fire({
                     title: "Eliminado",
@@ -181,9 +173,6 @@ const TurnosList = () => {
                 );
 
                 setTurnos(nuevosTurnos);
-                localStorage.setItem("turnos", JSON.stringify(nuevosTurnos));
-
-
 
                 Swal.fire({
                     title: "Atendido",
@@ -233,7 +222,6 @@ const TurnosList = () => {
                     }
                 }}
                 pacientesMock={pacientes}
-                medicosMock={medicos}
                 turnos={turnos}
             />
             {isUser && (
@@ -308,13 +296,13 @@ const TurnosList = () => {
                         ) : (
                             turnos.map(t => (
                                 <tr key={t.id}>
-                                    <td>{t.pacienteNombre}</td>
-                                    <td>{t.medicoNombre}</td>
-                                    <td>{t.fecha}</td>
-                                    <td>{t.hora}</td>
-                                    <td>{t.motivoConsulta}</td>
-                                    <td>{t.estado}</td>
-                                    <td>{t.estadoPago}</td>
+                                    <td>{t?.pacienteNombre}</td>
+                                    <td>{t?.medicoNombre}</td>
+                                    <td>{t?.fecha}</td>
+                                    <td>{t?.hora}</td>
+                                    <td>{t?.motivoConsulta}</td>
+                                    <td>{t?.estado}</td>
+                                    <td>{t?.estadoPago}</td>
                                     <td>
                                         {isAdmin && (
                                             <>

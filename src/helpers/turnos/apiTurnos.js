@@ -38,6 +38,7 @@ export const editarTurno = async (turno) => {
     return await respuesta.json();
   } catch (error) {
     console.error("Error:", error);
+    twoError(error);
   }
 };
 

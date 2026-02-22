@@ -94,6 +94,21 @@ const CrearTurno = ({
         }
     };
 
+    const generarHorarios = () => {
+        const horarios = [];
+        const inicio = 8;
+        const fin = 18;
+
+        for (let h = inicio; h < fin; h++) {
+            horarios.push(`${h.toString().padStart(2, "0")}:00`);
+            horarios.push(`${h.toString().padStart(2, "0")}:30`);
+        }
+
+        return horarios;
+    };
+
+    const horarios = generarHorarios();
+
     const today = new Date().toISOString().split("T")[0];
 
     const [form, setForm] = useState({
@@ -129,7 +144,7 @@ const CrearTurno = ({
 
             <form onSubmit={handleSubmit}>
                 <Modal.Body>
-                    <h5>Paciente</h5>
+                    <h5 className='mt-3'>Paciente</h5>
                     {!isUser ? (
                         <select
                             value={form.pacienteNombre}
@@ -155,7 +170,7 @@ const CrearTurno = ({
                         />
                     )}
 
-                    <h5>Médico</h5>
+                    <h5 className='mt-3'>Médico</h5>
                     <select
                         value={form.medicoNombre}
                         onChange={e => setForm({ ...form, medicoNombre: e.target.value })}
@@ -170,7 +185,7 @@ const CrearTurno = ({
                         ))}
                     </select>
 
-                    <h5>Fecha</h5>
+                    <h5 className='mt-3'>Fecha</h5>
                     <Form.Control
                         type="date"
                         value={form.fecha}
@@ -179,15 +194,22 @@ const CrearTurno = ({
                         required
                     />
 
-                    <h5>Hora</h5>
-                    <Form.Control
-                        type="time"
-                        value={form.hora}
-                        onChange={(e) => setForm({ ...form, hora: e.target.value })}
-                        required
-                    />
+                    <h5 className='mt-3'>Hora</h5>
+                    <div className="d-grid" style={{ gridTemplateColumns: "repeat(4, 1fr)", gap: "10px" }}>
+                        {horarios.map((hora) => (
+                            <button
+                                type="button"
+                                key={hora}
+                                className={`btn ${form.hora === hora ? "btn-primary" : "btn-outline-primary"
+                                    }`}
+                                onClick={() => setForm({ ...form, hora })}
+                            >
+                                {hora}
+                            </button>
+                        ))}
+                    </div>
 
-                    <h5>Motivo de Consulta</h5>
+                    <h5 className='mt-3'>Motivo de Consulta</h5>
                     <Form.Control
                         as="textarea"
                         rows={3}
@@ -208,7 +230,7 @@ const CrearTurno = ({
 
                     {!isUser ? (
                         <>
-                            <h5>Estado</h5>
+                            <h5 className='mt-3' >Estado</h5>
                             <select
                                 value={form.estado}
                                 onChange={e => setForm({ ...form, estado: e.target.value })}
@@ -224,7 +246,7 @@ const CrearTurno = ({
                         </>
                     ) : (
                         <>
-                            <h5>Método de Pago</h5>
+                            <h5 className='mt-3'>Método de Pago</h5>
                             <select
                                 className="form-select"
                                 value={form.metodoPago}
