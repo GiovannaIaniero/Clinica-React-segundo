@@ -58,6 +58,9 @@ export default function NavbarClinica() {
                     <NavDropdown.Item as={Link} to="/registroMedico">
                       Gestion de Medicos
                     </NavDropdown.Item>
+                    <NavDropdown.Item as={Link} to="/registrarPaciente">
+                      Gestion de Pacientes
+                    </NavDropdown.Item>
                   </NavDropdown>
                 ) : <NavDropdown title="Perfil" id="login-dropdown">
                     <NavDropdown.Item as={Link} to="/turnos">

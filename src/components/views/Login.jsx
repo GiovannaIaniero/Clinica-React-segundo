@@ -24,34 +24,34 @@ const Login = ({ onLogin }) => {
     }
   }
 
- const onSubmit = async (data) => {
-  try {
-    const result = await login(data.email, data.contraseña);
+  const onSubmit = async (data) => {
+    try {
+      const result = await login(data.email, data.contraseña);
 
-    if (result.error) {
-      setLoginError(result.error);
-      return;
+      if (result.error) {
+        setLoginError(result.error);
+        return;
+      }
+
+      // Obtener rol desde el token
+      const role = getRoleFromToken();
+
+      localStorage.setItem("token", result.token);
+
+      onLogin?.(role === "admin");
+
+      // Redirigir según rol REAL del token
+      if (role === "admin") {
+        navigate("/turnos");
+      } else {
+        navigate("/");
+      }
+
+    } catch (error) {
+      console.error(error);
+      setLoginError("Error al iniciar sesión");
     }
-
-    // Obtener rol desde el token
-    const role = getRoleFromToken();
-
-    localStorage.setItem("token", result.token);
-    
-    onLogin?.(role === "admin");
-
-    // Redirigir según rol REAL del token
-    if (role === "admin") {
-      navigate("/turnos");
-    } else {
-      navigate("/");
-    }
-
-  } catch (error) {
-    console.error(error);
-    setLoginError("Error al iniciar sesión");
-  }
-};
+  };
 
   return (
     <Card className="shadow p-3 mb-5 bg-body rounded card-login">
