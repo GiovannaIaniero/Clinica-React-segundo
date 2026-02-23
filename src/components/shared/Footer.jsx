@@ -33,7 +33,7 @@ function Footer() {
                 {/* Copyright */}
                 <Row className="footer-bottom mt-4">
                     <Col className="text-center">
-                        <small>© 2026 Clínica Ejemplo. Todos los derechos reservados.</small>
+                        <small>© 2026 Clínica Bienestar 360. Todos los derechos reservados.</small>
                     </Col>
                 </Row>
             </Container>
