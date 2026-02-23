@@ -5,7 +5,7 @@ import { useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { login, getRoleFromToken } from "../../helpers/login/apiLogin.js";
 
-const Login = ({ onLogin }) => {
+const Login = () => {
   const { register, handleSubmit, formState: { errors } } = useForm()
   const [loginError, setLoginError] = useState("");
   const navigate = useNavigate();
