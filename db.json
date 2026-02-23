@@ -9,5 +9,30 @@
       "motivoConsulta": " ",
       "estado": "Cancelado por el paciente"
     }
+  ],
+  "historiaClinica": [
+    {
+      "nombre": "Juancito pereyra",
+      "obraSocial": "",
+      "nroAfiliado": "Nro afiliado",
+      "antecedentes": "",
+      "alergias": "",
+      "medicacionHabitual": "",
+      "consultas": [
+        {
+          "fecha": "2026-02-23",
+          "diagnostico": "control anual",
+          "motivo": "chequeo general",
+          "indicaciones": "hidratación"
+        },
+        {
+          "fecha": "2026-02-23",
+          "diagnostico": "gripe",
+          "motivo": "estornudos",
+          "indicaciones": "reposo 3 dias"
+        }
+      ],
+      "id": "1"
+    }
   ]
 }
