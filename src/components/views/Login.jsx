@@ -34,8 +34,6 @@ const Login = () => {
     const role = getRoleFromToken();
 
     localStorage.setItem("token", result.token);
-    
-    onLogin?.(role === "admin");
 
     if (role === "admin") {
       navigate("/turnos");
