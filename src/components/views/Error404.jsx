@@ -1,6 +1,5 @@
 import { Container, Row, Col, Button, Card } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import errorImage from '../../../public/img/img-error.png';
 
 function Error404() {
     return (
@@ -10,7 +9,7 @@ function Error404() {
                     <Card className="text-center p-4 shadow-sm">
                         <Card.Body>
                             <img
-                                src={errorImage}
+                                src="/img/img-error.png"
                                 alt="Error 404"
                                 className="img-fluid mb-5 mx-auto d-block"
                                 style={{ maxWidth: "500px" }

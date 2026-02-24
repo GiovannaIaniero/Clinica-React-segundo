@@ -1,6 +1,5 @@
-import './App.css'
+﻿import './App.css'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { useState } from 'react'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 import Navbar from './components/shared/Navbar.jsx'
@@ -15,9 +14,6 @@ import HistoriaClinica from './components/historiaClinica/HistoriaClinica.jsx'
 import Error404 from './components/views/Error404.jsx'
 import Pago from './components/turnos/Pagos.jsx'
 import { getRoleFromToken } from './helpers/login/apiLogin.js';
-
-
-
 
 function App() {
 
@@ -37,6 +33,7 @@ function App() {
             <Route path='/guardia-medica' element={role === "medico" || role === "admin" ? <GuardiaMedica /> : <Navigate to="/login" />} />
             <Route path='/turnos' element={<TurnosList />} />
             <Route path='/login' element={<Login />} />
+            <Route path='/historiaClinica' element={role === "medico" || role === "admin" ? <HistoriaClinica /> : <Navigate to="/login" />} />
             <Route path='/historiaClinica' element={role === "medico" ? <HistoriaClinica /> : <Navigate to="/login" />} />
             <Route path='/registroMedico' element={<RegistroMedico />} />
             <Route path="pago" element={role === "paciente" ? <Pago /> : <Navigate to="/login" />} />
@@ -46,7 +43,7 @@ function App() {
         </main>
         <Footer />
       </BrowserRouter>
-      
+
     </div>
 
   )
