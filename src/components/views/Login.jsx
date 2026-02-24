@@ -1,4 +1,4 @@
-import { Card, Button, Row, Col, Form } from "react-bootstrap";
+﻿import { Card, Button, Row, Col, Form } from "react-bootstrap";
 import { Link, NavLink, useNavigate } from "react-router";
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
@@ -6,46 +6,42 @@ import { useForm } from "react-hook-form";
 import { login, getRoleFromToken } from "../../helpers/login/apiLogin.js";
 
 const Login = () => {
-  const { register, handleSubmit, formState: { errors } } = useForm()
+  const { register, handleSubmit, formState: { errors } } = useForm();
   const [loginError, setLoginError] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
   const rol = location.state?.tipoDeRegistro;
 
   const tipoDeRegistro = () => {
-    if (rol === "Paciente") {
-      return "/registrarPaciente";
-    } else if (rol === "Medico") {
-      return "/registroMedico";
-    } else {
-      return "/registrarPaciente"
+    if (rol === "Paciente") return "/registrarPaciente";
+    if (rol === "Medico") return "/registroMedico";
+    return "/registrarPaciente";
+  };
+
+  const onSubmit = async (data) => {
+    try {
+      const result = await login(data.email, data.contraseña);
+
+      if (result.error) {
+        setLoginError(result.error);
+        return;
+      }
+
+      localStorage.setItem("token", result.token);
+      const role = getRoleFromToken();
+
+      if (role === "admin") {
+        navigate("/turnos");
+      } else if (role === "medico") {
+        navigate("/historiaClinica");
+      } else {
+        navigate("/");
+      }
+    } catch (error) {
+      console.error(error);
+      setLoginError("Error al iniciar sesión");
     }
-  }
-
- const onSubmit = async (data) => {
-  try {
-    const result = await login(data.email, data.contraseña);
-
-    if (result.error) {
-      setLoginError(result.error);
-      return;
-    }
-
-    const role = getRoleFromToken();
-
-    localStorage.setItem("token", result.token);
-
-    if (role === "admin") {
-      navigate("/turnos");
-    } else {
-      navigate("/");
-    }
-
-  } catch (error) {
-    console.error(error);
-    setLoginError("Error al iniciar sesión");
-  }
-};
+  };
 
   return (
     <Card className="shadow p-3 mb-5 bg-body rounded card-login">
@@ -61,6 +57,7 @@ const Login = () => {
             {rol === undefined && (
               <h1 className="text-center mb-4">Ingreso</h1>
             )}
+
             <Form onSubmit={handleSubmit(onSubmit)}>
               <Form.Group className="mb-3" controlId="formBasicEmail">
                 <Form.Label>Email:</Form.Label>
@@ -71,8 +68,8 @@ const Login = () => {
                     required: "El email es obligatorio",
                     pattern: {
                       value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                      message: "Formato de email inválido"
-                    }
+                      message: "Formato de email inválido",
+                    },
                   })}
                 />
                 <Form.Text className="text-danger">{errors.email?.message}</Form.Text>
@@ -87,17 +84,15 @@ const Login = () => {
                     required: "La contraseña es obligatoria",
                     minLength: {
                       value: 6,
-                      message: "Debe tener al menos 6 caracteres"
-                    }
+                      message: "Debe tener al menos 6 caracteres",
+                    },
                   })}
                 />
                 <Form.Text className="text-danger">{errors.password?.message}</Form.Text>
                 <Form.Text className="text-danger">{loginError}</Form.Text>
               </Form.Group>
 
-              <Button
-                variant="warning"
-                type="submit">
+              <Button variant="warning" type="submit">
                 Iniciar sesión
               </Button>
               <Button
@@ -111,6 +106,7 @@ const Login = () => {
             </Form>
           </Card.Body>
         </Col>
+
         <Col>
           <img
             src="/img/img-login.jpg"
@@ -120,6 +116,7 @@ const Login = () => {
         </Col>
       </Row>
     </Card>
-  )
-}
+  );
+};
+
 export default Login;

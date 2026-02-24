@@ -12,7 +12,7 @@
   ],
   "historiaClinica": [
     {
-      "nombre": "Juancito pereyra",
+      "nombre": "pablo perez",
       "obraSocial": "",
       "nroAfiliado": "Nro afiliado",
       "antecedentes": "",
@@ -30,6 +30,18 @@
           "diagnostico": "gripe",
           "motivo": "estornudos",
           "indicaciones": "reposo 3 dias"
+        },
+        {
+          "fecha": "2026-02-23",
+          "diagnostico": "gripe",
+          "motivo": "dolor de cabeza",
+          "indicaciones": "reposo"
+        },
+        {
+          "fecha": "2026-02-23",
+          "diagnostico": "resfrio",
+          "motivo": "dolor de cabeza",
+          "indicaciones": "reposo"
         }
       ],
       "id": "1"
