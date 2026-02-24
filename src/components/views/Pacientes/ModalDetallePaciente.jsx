@@ -16,7 +16,7 @@ const ModalDetallePaciente = ({ show, handleClose, paciente }) => {
                 <hr />
                 <p><strong>Obra Social:</strong> {paciente.obraSocial}</p>
                 <p><strong>Email:</strong> {paciente.email}</p>
-                <p><strong>Contraseña:</strong> {paciente.contraseña}</p>
+                <p><strong>Contraseña:</strong> ***********</p>
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="secondary" onClick={handleClose}>
