@@ -55,7 +55,7 @@ const Login = ({ onLogin }) => {
   return (
     <Card className="shadow p-3 mb-5 bg-body rounded card-login">
       <Row xs={1} md={2}>
-        <Col>
+        <Col className="mt-4">
           <Card.Body>
             {rol === "Paciente" && (
               <h1 className="text-center mb-4">Ingreso de paciente</h1>
@@ -113,7 +113,6 @@ const Login = ({ onLogin }) => {
                   {loginError}
                 </Form.Text>
               </Form.Group>
-
               <Button
                 variant="primary"
                 type="submit">
@@ -128,6 +127,14 @@ const Login = ({ onLogin }) => {
                 Registrarse
               </Button>
             </Form>
+            <div className="text-center mt-3">
+              <Link
+                to="/recuperar-password"
+                className="text-decoration-none"
+              >
+                ¿Olvidaste tu contraseña?
+              </Link>
+            </div>
           </Card.Body>
         </Col>
         <Col>

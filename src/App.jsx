@@ -17,6 +17,7 @@ import Error404 from './components/views/Error404.jsx'
 import ItemPacientes from './components/views/Pacientes/ItemPacientes.jsx'
 import Pago from './components/turnos/Pagos.jsx'
 import { getRoleFromToken } from './helpers/login/apiLogin.js';
+import RecuperarPassword from './components/views/RecuperarPassword.jsx';
 
 
 
@@ -41,7 +42,8 @@ function App() {
             <Route path='/registrarPaciente' element={<RegistrarPaciente />} />
             <Route path='/guardia-medica' element={role === "medico" || role === "admin" ? <GuardiaMedica /> : <Navigate to="/login" />} />
             <Route path='/turnos' element={<TurnosList />} />
-            <Route path='/login' element={<Login onLogin={setIsAdmin} />} />
+            <Route path='/login' element={<Login />} />
+            <Route path='/recuperar-password' element={<RecuperarPassword />} />
             <Route path='/historiaClinica' element={role === "medico" ? <HistoriaClinica /> : <Navigate to="/login" />} />
             <Route path='/registroMedico' element={<RegistroMedico />} />
             <Route path="pago" element={role === "paciente" ? <Pago /> : <Navigate to="/login" />} />
