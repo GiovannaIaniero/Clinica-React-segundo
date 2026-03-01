@@ -1,7 +1,12 @@
-import { Table, Alert } from "react-bootstrap";
+﻿import { Table, Alert } from "react-bootstrap";
+
+const safeText = (value) => {
+  const normalized = String(value ?? "").replace(/\s+/g, " ").trim();
+  return normalized || "-";
+};
 
 function ListaEvoluciones({ consultas }) {
-  if (!consultas || consultas.length === 0) {
+  if (!Array.isArray(consultas) || consultas.length === 0) {
     return (
       <Alert variant="info" className="mb-0">
         No hay consultas registradas.
@@ -21,11 +26,11 @@ function ListaEvoluciones({ consultas }) {
       </thead>
       <tbody>
         {consultas.map((c, index) => (
-          <tr key={index}>
-            <td>{c.fecha}</td>
-            <td>{c.motivo}</td>
-            <td>{c.diagnostico}</td>
-            <td>{c.indicaciones}</td>
+          <tr key={`${c?.fecha || "sin-fecha"}-${index}`}>
+            <td>{safeText(c?.fecha)}</td>
+            <td>{safeText(c?.motivo)}</td>
+            <td>{safeText(c?.diagnostico)}</td>
+            <td>{safeText(c?.indicaciones)}</td>
           </tr>
         ))}
       </tbody>

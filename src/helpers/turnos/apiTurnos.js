@@ -16,7 +16,8 @@ export const crearTurno = async (turno) => {
 
     return await respuesta.json();
   } catch (error) {
-    console.error("Error:", error);
+    console.error("Error en crearTurno:", error.message);
+    throw error;
   }
 };
 
@@ -26,6 +27,7 @@ export const editarTurno = async (turno) => {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${localStorage.getItem("token")}`
       },
       body: JSON.stringify(turno),
     });
@@ -37,34 +39,40 @@ export const editarTurno = async (turno) => {
     return await respuesta.json();
   } catch (error) {
     console.error("Error:", error);
+    twoError(error);
   }
 };
 
 export const borrarTurno = async (turno) => {
   try {
-  
+
     const respuesta = await fetch(`${turnosBackend}/${turno._id}`, {
       method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${localStorage.getItem("token")}`
+      }
     });
 
     if (!respuesta.ok) {
       throw new Error("Error al borrar turno");
     }
 
-    return true;    
+    return true;
   } catch (error) {
     return false;
   }
 };
 
-export const cancelarTurno = async (turno, nuevoEstado) => {
+export const cancelarTurno = async (turno, estado) => {
   try {
-    const respuesta = await fetch(`${turnosBackend}/${turno._id}`, {
-      method: "PATCH", // mejor que PUT para solo cambiar estado
+    const respuesta = await fetch(`${turnosBackend}/${turno._id}/cancelar`, {
+      method: "PATCH",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${localStorage.getItem("token")}`
       },
-      body: JSON.stringify({ estado: nuevoEstado })
+      body: JSON.stringify({ estado })
     });
 
     if (!respuesta.ok) throw new Error("Error al cancelar turno");

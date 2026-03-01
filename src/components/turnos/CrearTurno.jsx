@@ -5,6 +5,8 @@ import Form from 'react-bootstrap/Form';
 import { validarTurnoCompleto } from '../../helpers/turnos/ValidacionesTurnos';
 import { useNavigate } from "react-router-dom";
 import { getRoleFromToken } from '../../helpers/login/apiLogin.js';
+import { listarDoctores } from '../../helpers/registroDoctores/apiDoctores.js';
+import { listarPacientes } from '../../helpers/pacientes/apiPacientes.js';
 
 const CrearTurno = ({
     show,
@@ -12,22 +14,54 @@ const CrearTurno = ({
     onSave,
     mode,
     turnoEdit,
-    pacientesMock,
-    medicosMock,
     turnos,
-    nuevoTurno
 }) => {
 
     const [error, setError] = useState("");
     const navigate = useNavigate();
-
+    const [medicos, setMedicos] = useState([]);
+    const [pacientes, setPacientes] = useState([]);
     const role = getRoleFromToken();
-
-    const isAdmin = role === "admin"
-    const isUser = role === "user"
-    const isMedico = role === "medico"
+    const isUser = role === "paciente"
 
     useEffect(() => {
+
+        const cargarMedicos = async () => {
+            try {
+                const data = await listarDoctores();
+
+                const medicosFormateados = data.filter(m => m.role !== "admin").map(m => ({
+                    id: m._id,
+                    nombre: m.nombre_y_apellido
+                }));
+
+                setMedicos(medicosFormateados);
+
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        cargarMedicos();
+
+        const cargarPacientes = async () => {
+            try {
+                const data = await listarPacientes();
+
+                const pacientesFormateados = data.filter(p => p.role !== "admin").map(p => ({
+                    id: p._id,
+                    nombre: p.nombre_y_apellido
+                }));
+
+                setPacientes(pacientesFormateados);
+
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        cargarPacientes();
+
         if (mode === "editar" && turnoEdit) {
             setForm(turnoEdit);
         } else if (mode === "crear") {
@@ -45,9 +79,13 @@ const CrearTurno = ({
             return;
         }
 
+        if (!form.hora) {
+            setError("Debe seleccionar una hora para el turno.");
+            return;
+        }
+
         setError("");
 
-        // 👤 SI ES USUARIO → ir a pantalla de pago
         if (isUser && form.metodoPago === "tarjeta") {
             navigate("/pago", {
                 state: form
@@ -55,7 +93,6 @@ const CrearTurno = ({
             return;
         }
 
-        // 👨‍⚕️ ADMIN / MÉDICO → flujo original
         const success = await onSave(form);
 
         if (success) {
@@ -73,6 +110,21 @@ const CrearTurno = ({
             return turnoEdit.estado;
         }
     };
+
+    const generarHorarios = () => {
+        const horarios = [];
+        const inicio = 8;
+        const fin = 18;
+
+        for (let h = inicio; h < fin; h++) {
+            horarios.push(`${h.toString().padStart(2, "0")}:00`);
+            horarios.push(`${h.toString().padStart(2, "0")}:30`);
+        }
+
+        return horarios;
+    };
+
+    const horarios = generarHorarios();
 
     const today = new Date().toISOString().split("T")[0];
 
@@ -109,16 +161,16 @@ const CrearTurno = ({
 
             <form onSubmit={handleSubmit}>
                 <Modal.Body>
-                    <h5>Paciente</h5>
+                    <h5 className='mt-3'>Paciente</h5>
                     {!isUser ? (
                         <select
                             value={form.pacienteNombre}
                             onChange={e => setForm({ ...form, pacienteNombre: e.target.value })}
-                            className="form-select"
+                            className='form-select'
                             required
                         >
                             <option value="">Seleccionar paciente</option>
-                            {pacientesMock.map(p => (
+                            {pacientes.map(p => (
                                 <option key={p.id} value={p.nombre}>
                                     {p.nombre}
                                 </option>
@@ -135,7 +187,7 @@ const CrearTurno = ({
                         />
                     )}
 
-                    <h5>Médico</h5>
+                    <h5 className='mt-3'>Médico</h5>
                     <select
                         value={form.medicoNombre}
                         onChange={e => setForm({ ...form, medicoNombre: e.target.value })}
@@ -143,12 +195,14 @@ const CrearTurno = ({
                         required
                     >
                         <option value="">Seleccionar médico</option>
-                        {medicosMock.map(m => (
-                            <option key={m.id} value={m.nombre}>{m.nombre}</option>
+                        {medicos.map(m => (
+                            <option key={m.id} value={m.nombre}>
+                                {m.nombre}
+                            </option>
                         ))}
                     </select>
 
-                    <h5>Fecha</h5>
+                    <h5 className='mt-3'>Fecha</h5>
                     <Form.Control
                         type="date"
                         value={form.fecha}
@@ -157,15 +211,22 @@ const CrearTurno = ({
                         required
                     />
 
-                    <h5>Hora</h5>
-                    <Form.Control
-                        type="time"
-                        value={form.hora}
-                        onChange={(e) => setForm({ ...form, hora: e.target.value })}
-                        required
-                    />
+                    <h5 className='mt-3'>Hora</h5>
+                    <div className="d-grid" style={{ gridTemplateColumns: "repeat(4, 1fr)", gap: "10px" }}>
+                        {horarios.map((hora) => (
+                            <button
+                                type="button"
+                                key={hora}
+                                className={`btn ${form.hora === hora ? "btn-primary" : "btn-outline-primary"
+                                    }`}
+                                onClick={() => setForm({ ...form, hora })}
+                            >
+                                {hora}
+                            </button>
+                        ))}
+                    </div>
 
-                    <h5>Motivo de Consulta</h5>
+                    <h5 className='mt-3'>Motivo de Consulta</h5>
                     <Form.Control
                         as="textarea"
                         rows={3}
@@ -186,7 +247,7 @@ const CrearTurno = ({
 
                     {!isUser ? (
                         <>
-                            <h5>Estado</h5>
+                            <h5 className='mt-3' >Estado</h5>
                             <select
                                 value={form.estado}
                                 onChange={e => setForm({ ...form, estado: e.target.value })}
@@ -202,7 +263,7 @@ const CrearTurno = ({
                         </>
                     ) : (
                         <>
-                            <h5>Método de Pago</h5>
+                            <h5 className='mt-3'>Método de Pago</h5>
                             <select
                                 className="form-select"
                                 value={form.metodoPago}

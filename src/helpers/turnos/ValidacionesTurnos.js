@@ -1,6 +1,5 @@
 export const validarTurnoDuplicado = (turnos, nuevoTurno, turnoEdit = null) => {
   return turnos.some(t => {
-    // Si estoy editando, no comparo contra el mismo turno
     if (turnoEdit && t._id === turnoEdit._id) return false;
 
     return (
@@ -73,7 +72,6 @@ export const validarSuperposicion = (
 
   if (!conflicto) return null;
 
-  // calculamos fin del turno conflictivo
   const inicio = new Date(`${conflicto.fecha}T${conflicto.hora}`);
   const fin = new Date(inicio.getTime() + duracionMinutos * 60000);
 
@@ -83,6 +81,14 @@ export const validarSuperposicion = (
   };
 };
 
+export const validarFechaAtrasada = (fecha, hora) => {
+
+  const fechaHoraTurno = new Date(`${fecha}T${hora}:00`);
+  const ahora = new Date();
+
+  return fechaHoraTurno <= ahora;
+};
+
 
 export const validarTurnoCompleto = (
   turnos,
@@ -90,9 +96,12 @@ export const validarTurnoCompleto = (
   turnoEdit = null
 ) => {
 
-  // ❌ Fin de semana
   if (validarFinDeSemana(nuevoTurno.fecha)) {
     return "La clínica no atiende fines de semana.";
+  }
+
+  if (validarFechaAtrasada(nuevoTurno.fecha, nuevoTurno.hora)) {
+    return "No se pueden crear turnos en horarios que ya pasaron.";
   }
 
   if (
@@ -104,18 +113,15 @@ export const validarTurnoCompleto = (
     return "El turno está fuera del horario laboral (08:00 - 18:00).";
   }
 
-  // ❌ Duplicado exacto
   if (validarTurnoDuplicado(turnos, nuevoTurno, turnoEdit)) {
     return "Ese médico ya tiene un turno en ese mismo horario.";
   }
 
-  // ❌ Superposición
   const conflicto = validarSuperposicion(turnos, nuevoTurno, turnoEdit);
 
   if (conflicto) {
     return `El médico ya tiene un turno de ${conflicto.hora} a ${conflicto.horaFin}.`;
   }
 
-  // ✅ Todo correcto
   return null;
 };

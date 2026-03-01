@@ -9,6 +9,7 @@ lerna-debug.log*
 
 node_modules
 .env
+
 CORRECCIONES.txt
 dist
 dist-ssr
