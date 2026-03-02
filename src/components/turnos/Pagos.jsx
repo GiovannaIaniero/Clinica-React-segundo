@@ -10,7 +10,6 @@ const Pago = () => {
 
   const [loading, setLoading] = useState(false);
 
-  // Si alguien entra directo sin datos
   if (!datosTurno) {
     return (
       <div className="container mt-4">
@@ -26,22 +25,21 @@ const Pago = () => {
     try {
       setLoading(true);
 
-      // 💵 EFECTIVO
       if (datosTurno.metodoPago === "efectivo") {
         const response = await crearTurno(datosTurno);
 
         if (!response.ok) throw new Error("Error al crear turno");
 
         alert("Turno creado correctamente. Pago pendiente en clínica.");
-        navigate("/"); // o donde quieras redirigir
+        navigate("/"); 
       }
 
-      // 💳 TARJETA (Mercado Pago)
       if (datosTurno.metodoPago === "tarjeta") {
         const response = await iniciarPagoTurno(datosTurno);
 
         if (response?.init_point) {
-          window.location.href = response.init_point;
+          window.open(response.init_point, "_blank");
+          navigate("/"); 
         } else {
           throw new Error("Error al iniciar pago");
         }
@@ -74,6 +72,7 @@ const Pago = () => {
           className="btn btn-success mt-3"
           onClick={handleConfirmarPago}
           disabled={loading}
+
         >
           {loading ? "Procesando..." : "Confirmar y Pagar"}
         </button>

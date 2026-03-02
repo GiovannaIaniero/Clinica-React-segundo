@@ -1,80 +1,129 @@
 footer {
-    background-color: #ebedef92;
-    color: black;
-    padding: 20px 0;
-    margin-top: 60px;
-
-}
-
-.footer-column {
-    text-align: left;
-    margin: 0;
-    font-style: Roboto;
-    
-}
-
-.footer-nav {
-    gap: 1px;
-    color: #aad69d;
-    text-decoration: none;
-}
-
-.footer-link {
-    padding: 0;
-    margin: 2px 0;
-    font-size: 14px;
-    color: #fbfbfc;
-    text-decoration: none;
-}
-
-footer h4 {
-    font-size: 20px;
-    font-style: Roboto;
-    margin-bottom: 10px;
-    
-}
-
-footer p {
-    margin: 0;
-    opacity: 0.8;
-    font-style: Roboto;
-    color: rgb(67, 64, 64);
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    font-style: italic;
-}
-
-footer strong {
-    font-size: 16px;
-    margin-bottom: 10px;
-}
-
-.footer a {
-    color: #6ec8bd;
-    text-decoration: none;
-    font-size: 15px;
-    margin: 4px 0;
-    padding: 0;
-    font-style: Roboto;
-
-}
-
-footer a:hover {
-    color: #ffffffcc;
-    transform: translateX(3px);
-    transition: 0.2s ease;
-}
-
-img {
-    width: 180px;
-    height: 180px;;
-}
-
-.footer-nav .nav-link {
-    margin: 1px;
+  width: 100%;
+  background: rgba(17, 68, 50, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 30px 20px;
+  margin-top: 60px;
+  text-align: center;
 }
 
 .footer-container {
-    padding: 0;
-    margin: 0;
-    max-width: 100%;
+  max-width: 100%;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+.footer-logo img {
+  width: 160px;
+  height: auto;
+  margin-bottom: 10px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.footer-slogan {
+  font-style: italic;
+  opacity: 0.9;
+  margin: 0;
+}
+
+.footer-column {
+  margin-bottom: 20px;
+}
+
+.footer-column h4 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.footer-nav .nav-link,
+.footer-column p,
+footer strong {
+  color: white;
+  font-size: 14px;
+  margin: 2px 0;
+  text-decoration: none;
+  opacity: 0.9;
+}
+
+.footer-nav {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+@media(min-width: 768px) {
+  .footer-nav {
+    align-items: flex-start;
+  }
+}
+
+.footer-nav .nav-link:hover {
+  color: #aad69d;
+  transform: translateX(2px);
+  transition: 0.2s ease;
+}
+
+.footer-bottom small {
+  color: #ddd;
+  font-size: 13px;
+  margin-top: 10px;
+}
+
+/* Mobile adjustments */
+@media (max-width: 767px) {
+  .footer-logo,
+  .footer-column {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+}
+
+
+.footer-logo {
+  text-align: center; /* centrar todo el contenido dentro */
+}
+
+.footer-logo img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 160px;
+  height: auto;
+}
+
+.footer-slogan {
+  font-style: italic;
+  opacity: 0.9;
+  margin-top: 8px; /* separación del texto con la imagen */
+  margin-bottom: 0;
+  color: white;
+  font-size: 1rem;
+}
+
+/* Responsive: ajustar tamaño texto en móviles */
+@media (max-width: 767px) {
+  .footer-slogan {
+    font-size: 0.9rem;
+  }
+}
+
+
+/* Títulos de columnas específicas */
+.footer-column h4 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #aad69d;  /* color verde suave */
+}
+
+/* Texto de la columna de información y ubicación */
+.footer-column.contact-info p,
+.footer-column.about-clinic p {
+    color: #aad69d;
+    opacity: 0.9;
 }

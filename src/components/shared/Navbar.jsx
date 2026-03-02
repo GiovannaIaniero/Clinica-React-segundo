@@ -1,6 +1,5 @@
 import { Navbar, Nav, NavDropdown, Container } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
 import { getRoleFromToken } from '../../helpers/login/apiLogin.js';
 import { useNavigate } from "react-router";
 
@@ -57,6 +56,9 @@ export default function NavbarClinica() {
                     </NavDropdown.Item>
                     <NavDropdown.Item as={Link} to="/registroMedico">
                       Gestion de Medicos
+                    </NavDropdown.Item>
+                    <NavDropdown.Item as={Link} to="/registrarPaciente">
+                      Gestion de Pacientes
                     </NavDropdown.Item>
                   </NavDropdown>
                 ) : <NavDropdown title="Perfil" id="login-dropdown">

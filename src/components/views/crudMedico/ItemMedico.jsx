@@ -24,7 +24,7 @@ const ItemMedico = ({ medico, borrarMedico, modificarMedico, verDetalleMedico })
           </Card.Text>
 
           <Card.Text>
-            Email: {medico.email_medico}
+            Email: {medico.email}
           </Card.Text>
 
           <div className='d-flex justify-content-center align-item-center gap-2'>
@@ -59,14 +59,14 @@ const ItemMedico = ({ medico, borrarMedico, modificarMedico, verDetalleMedico })
             src="https://encrypted-tbn1.gstatic.com/licensed-image?q=tbn:ANd9GcSuEBa1zuFIvWpp5uaXrimbkTCnDJ2lbzz7tQBdZvFabvT4xLC2ikF9y7qvhdoijiWKdXlqQzVThT6sqxlhJBkxvjFpa3e2qksd_FK1TMu_ONvju_o"
           />
           <Card.Body>
-            <Card.Title>Dr/a {medico.nombre_y_apellido_medico}</Card.Title>
+            <Card.Title>Dr/a {medico.nombre_y_apellido}</Card.Title>
 
             <Card.Text className='mt-4'>
               Especialidad: {medico.especialidad}
             </Card.Text>
 
             <Card.Text>
-              Email: {medico.email_medico}
+              Email: {medico.email}
             </Card.Text>
 
             <div className='d-flex justify-content-center align-item-center gap-2'>

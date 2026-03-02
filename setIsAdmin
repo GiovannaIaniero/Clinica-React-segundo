@@ -1,0 +1,81 @@
+[1mdiff --git a/README.md b/README.md[m
+[1mindex 3ce3423..2a001c7 100644[m
+[1m--- a/README.md[m
+[1m+++ b/README.md[m
+[36m@@ -1,5 +1,7 @@[m
+[31m-# Bienestar360 [m
+[31m-Bienvenidos a nuestro proyecto del segundo modulo de programacion ! [m
+[32m+[m[32m<<<<<<< HEAD[m
+[32m+[m[32m# Bienestar360 - Clinica Medica[m
+[32m+[m[32mBienvenidos a nuestro proyecto del segundo modulo de programacion[m[41m [m
+[32m+[m[32mNuestro tema elegido para este proyecto fue Clinica Medica ⚕️[m
+ [m
+ ## Integrantes 📚[m
+ - Luana Jakubowicz **(SCRUM Master)**[m
+[36m@@ -8,7 +10,46 @@[m [mBienvenidos a nuestro proyecto del segundo modulo de programacion ![m
+ - Nahuel Nuñez[m
+ - Miguel Zambrano[m
+ [m
+[32m+[m[32m<<<<<<< HEAD[m
+[32m+[m[32m## 📌 Descripción del proyecto[m
+[32m+[m[32mEsta es una aplicación web para una clínica médica, desarrollada con React, que centraliza distintas funciones tanto para pacientes como para profesionales de la salud.[m
+[32m+[m[32mEl sistema busca mejorar la organización interna y ofrecer herramientas accesibles desde cualquier dispositivo.[m
+ [m
+[31m-## ...para completar[m
+[32m+[m[32mLa plataforma cuenta con tres módulos principales:[m
+ [m
+[32m+[m[32m### 🔐 1. Login para pacientes y médicos[m
+[32m+[m
+[32m+[m[32mEl sitio dispone de un sistema de inicio de sesión donde cada usuario accede a funcionalidades según su rol:[m
+[32m+[m[32mPacientes: pueden ingresar para visualizar su información personal y acceder a su historia clínica.[m
+[32m+[m[32mMédicos: pueden acceder al panel profesional y visualizar sus propias secciones habilitadas.[m
+[32m+[m
+[32m+[m[32m### 📄 2. Visualización de Historia Clínica[m
+[32m+[m
+[32m+[m[32mCada paciente puede consultar su historia clínica, que incluye información médica relevante.[m
+[32m+[m[32mLa interfaz es clara, ordenada y accesible, permitiendo que el paciente vea su información sin necesidad de acudir presencialmente.[m
+[32m+[m
+[32m+[m[32m### ⚕️ 3. Gestión de Guardia Médica[m
+[32m+[m
+[32m+[m[32mEl módulo de guardia médica permite:[m
+[32m+[m
+[32m+[m[32m**Administradores:** crear, editar, visualizar y eliminar médicos de guardia. <br>[m
+[32m+[m[32m**Usuarios visitantes:** ver qué profesionales están atendiendo en turnos actuales.[m
+[32m+[m
+[32m+[m[32m## 👨‍⚕️🧑‍💻🙍Roles[m
+[32m+[m[32m<strong>Administrador:</strong> Puede crear, modificar y eliminar. <br>[m
+[32m+[m
+[32m+[m[32m<strong>Profesional de la Salud:</strong> Puede crear, modificar y eliminar tambien, pero solo lo que tenga que ver con su labor.[m[41m   [m
+[32m+[m
+[32m+[m[32m<strong>Visitante:</strong> Solo puede visualizar.[m
+[32m+[m
+[32m+[m[32m## Link del deploy[m
+[32m+[m
+[32m+[m[32mhttps://clinica-git-main-tomas-projects-affede4a.vercel.app/[m
+[32m+[m
+[32m+[m[32m## 🔧 Instalación y ejecución[m
+[32m+[m
+[32m+[m[32mEn la terminal de Visual Studio Code (preferiblemente git bash) coloque los siguientes comandos para ver el correspondiente localhost:[m
+[32m+[m
+[32m+[m[32m1. npm install o npm i <br>[m[41m [m
+[32m+[m[32m2. npm start[m
+ [m
+[1mdiff --git a/public/img/Photoroom_20251201_040109.png b/public/img/Photoroom_20251201_040109.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..7063af2[m
+Binary files /dev/null and b/public/img/Photoroom_20251201_040109.png differ
+[1mdiff --git a/src/components/views/Pacientes/ItemPacientes.jsx b/src/components/views/Pacientes/ItemPacientes.jsx[m
+[1mindex 5d22ad9..4f7c040 100644[m
+[1m--- a/src/components/views/Pacientes/ItemPacientes.jsx[m
+[1m+++ b/src/components/views/Pacientes/ItemPacientes.jsx[m
+[36m@@ -8,8 +8,8 @@[m [mconst ItemPacientes = ({ paciente, borrarPaciente, modificarPaciente, verDetalle[m
+       <Card className="shadow-lg patient-card col-md-12">[m
+         <Card.Img[m
+           variant="top"[m
+[31m-          className="patient-card-img"[m
+[31m-          src="https://img.freepik.com/free-vector/doctor-character-background_1270-84.jpg"[m
+[32m+[m[32m          className="patient-card-img w-100 h-100"[m
+[32m+[m[32m          src="https://img.freepik.com/vector-premium/icono-perfil-usuario-estilo-plano-ilustracion-vector-avatar-miembro-sobre-fondo-aislado-concepto-negocio-signo-permiso-humano_157943-15752.jpg?semt=ais_hybrid&w=740&q=80"[m
+         />[m
+         <Card.Body>[m
+           <Card.Title>Paciente: {paciente.nombre_y_apellido}</Card.Title>[m

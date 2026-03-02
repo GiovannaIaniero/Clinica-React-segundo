@@ -37,10 +37,8 @@ const RegistroMedico = () => {
     setValue
   } = useForm()
 
-  // 🔥 Ahora viene del backend
   const [medicos, setMedicos] = useState([]);
 
-  // 🔥 Cargar doctores al iniciar
   useEffect(() => {
     const cargarDoctores = async () => {
       try {
@@ -53,7 +51,6 @@ const RegistroMedico = () => {
     cargarDoctores();
   }, []);
 
-  // Función principal que maneja CREAR y EDITAR
   const crearYEditar = async (data) => {
 
     try {
@@ -69,7 +66,7 @@ const RegistroMedico = () => {
 
         Swal.fire({
           title: "Médico Actualizado!",
-          text: `${data.nombre_y_apellido_medico} ha sido modificado.`,
+          text: `${data.nombre_y_apellido} ha sido modificado.`,
           icon: "success",
         });
 
@@ -89,7 +86,6 @@ const RegistroMedico = () => {
         });
       }
 
-      // 🔥 Refrescar lista desde backend
       const listaActualizada = await listarDoctores();
       setMedicos(listaActualizada);
 
@@ -113,9 +109,9 @@ const RegistroMedico = () => {
       setEstoyEditando(true);
       setMedicoEditar(id);
 
-      setValue('nombre_y_apellido_medico', medicoSeleccionado.nombre_y_apellido_medico)
+      setValue('nombre_y_apellido', medicoSeleccionado.nombre_y_apellido)
       setValue('especialidad', medicoSeleccionado.especialidad)
-      setValue('email_medico', medicoSeleccionado.email_medico)
+      setValue('email', medicoSeleccionado.email)
       setValue('contraseña', medicoSeleccionado.contraseña)
       setValue('contraseña_confirmar', medicoSeleccionado.contraseña)
     }
@@ -173,7 +169,7 @@ const RegistroMedico = () => {
               <Form.Control
                 type="text"
                 placeholder="Ej: Juan Perez"
-                {...register("nombre_y_apellido_medico", {
+                {...register("nombre_y_apellido", {
                   required: "Este campo es obligatorio",
                   minLength: {
                     value: 5,
@@ -187,7 +183,7 @@ const RegistroMedico = () => {
               />
             </div>
             <Form.Text className="text-danger">
-              {errors.nombre_y_apellido_medico?.message}
+              {errors.nombre_y_apellido?.message}
             </Form.Text>
           </Form.Group>
 
@@ -217,13 +213,13 @@ const RegistroMedico = () => {
                 type="email"
                 placeholder="Ej: juanperez@gmail.com"
                 disabled={estoyEditando}
-                {...register("email_medico", {
+                {...register("email", {
                   required: "Este campo es obligatorio"
                 })}
               />
             </div>
             <Form.Text className="text-danger">
-              {errors.email_medico?.message}
+              {errors.email?.message}
             </Form.Text>
           </Form.Group>
 
