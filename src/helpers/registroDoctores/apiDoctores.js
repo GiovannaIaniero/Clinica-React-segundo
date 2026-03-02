@@ -1,14 +1,27 @@
 const doctoresBackend = import.meta.env.VITE_API_DOCTORES;
 
 export const crearDoctor = async (doctor) => {
-  const respuesta = await fetch(doctoresBackend, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(doctor),
-  });
+  try {
+    const respuesta = await fetch(doctoresBackend, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(doctor),
+    });
 
-  if (!respuesta.ok) throw new Error("Error al crear doctor");
-  return await respuesta.json();
+    const data = await respuesta.json();
+
+    if (!respuesta.ok) {
+      // crea un Error y le agrego una propiedad response con status y data
+      const err = new Error("Error al crear doctor");
+      err.response = { status: respuesta.status, data };
+      throw err;
+    }
+
+    return data;
+  } catch (error) {
+    // Si es un error de red (fetch) lo relanzo para que el caller lo maneje
+    throw error;
+  }
 };
 
 export const listarDoctores = async () => {

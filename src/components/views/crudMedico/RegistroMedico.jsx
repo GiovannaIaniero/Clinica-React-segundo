@@ -12,18 +12,18 @@ const RegistroMedico = () => {
 
   /* EDITAR */
   const [estoyEditando, setEstoyEditando] = useState(false)
-  const [medicoEditar, setMedicoEditar] = useState(null)  
+  const [medicoEditar, setMedicoEditar] = useState(null)
 
   /* VER */
   const [mostrarModal, setMostrarModal] = useState(false);
   const [medicoSeleccionado, setMedicoSeleccionado] = useState(null);
 
-  const verDetalleMedico = (medico) =>{
+  const verDetalleMedico = (medico) => {
     setMedicoSeleccionado(medico);
     setMostrarModal(true)
   };
 
-  const handleCloseModal = () =>{
+  const handleCloseModal = () => {
     setMostrarModal(false)
     setMedicoSeleccionado(null)
   }
@@ -32,9 +32,10 @@ const RegistroMedico = () => {
     register,
     handleSubmit,
     reset,
-    formState:{errors},
+    formState: { errors },
     getValues,
-    setValue
+    setValue,
+    setError
   } = useForm()
 
   const [medicos, setMedicos] = useState([]);
@@ -55,7 +56,7 @@ const RegistroMedico = () => {
 
     try {
 
-      if(estoyEditando) {
+      if (estoyEditando) {
 
         const doctorActualizado = {
           ...data,
@@ -75,15 +76,16 @@ const RegistroMedico = () => {
         const nuevoMedico = {
           ...data,
           role: "medico"
-        };  
+        };
 
         await crearDoctor(nuevoMedico);
 
         Swal.fire({
           title: "Creaste un usuario!",
-          text: `${data.nombre_y_apellido_medico} esta habilitado.`,
+          text: `${data.nombre_y_apellido} esta habilitado.`,
           icon: "success",
         });
+
       }
 
       const listaActualizada = await listarDoctores();
@@ -94,6 +96,17 @@ const RegistroMedico = () => {
       reset();
 
     } catch (error) {
+
+      if (error.response?.status === 400) {
+        error.response.data.errores.forEach(err => {
+          setError(err.campo, {
+            type: "server",
+            message: err.mensaje
+          });
+        });
+        return;
+      }
+
       console.error(error);
     }
   }
@@ -104,7 +117,7 @@ const RegistroMedico = () => {
       (medico) => medico._id === id
     );
 
-    if(medicoSeleccionado){
+    if (medicoSeleccionado) {
 
       setEstoyEditando(true);
       setMedicoEditar(id);
@@ -191,7 +204,7 @@ const RegistroMedico = () => {
             <div className="containerLabelControl">
               <Form.Label className="col-5 col-md-4">Especialidad</Form.Label>
               <Form.Select {...register("especialidad", {
-                required:"Tienes que ingresar una opción"
+                required: "Tienes que ingresar una opción"
               })}>
                 <option value="">Seleccione una opción</option>
                 <option value="Clinica Gral">Clinica Gral</option>
@@ -204,7 +217,7 @@ const RegistroMedico = () => {
             <Form.Text className="text-danger">
               {errors.especialidad?.message}
             </Form.Text>
-          </Form.Group>    
+          </Form.Group>
 
           <Form.Group className="mb-3">
             <div className="containerLabelControl">
@@ -234,6 +247,9 @@ const RegistroMedico = () => {
                 })}
               />
             </div>
+            <Form.Text className="text-danger">
+              {errors.contraseña?.message}
+            </Form.Text>
           </Form.Group>
 
           <Form.Group className="mb-3">
@@ -249,9 +265,12 @@ const RegistroMedico = () => {
                 })}
               />
             </div>
+            <Form.Text className="text-danger">
+              {errors.contraseña_confirmar?.message}
+            </Form.Text>
           </Form.Group>
 
-          <Button variant={estoyEditando? "warning" : "success"} type="submit">
+          <Button variant={estoyEditando ? "warning" : "success"} type="submit">
             {estoyEditando ? "Guardar Cambios" : "Registrar"}
           </Button>
 
