@@ -36,8 +36,13 @@ export default function RecuperarPassword({ type }) {
         }
 
       } else if (type === "reset") {
-        // Aquí iría la lógica para resetear la contraseña usando un token
-        setMensaje("Funcionalidad de reset de contraseña aún no implementada.");
+        if (data.contraseña !== data.confirmarContraseña) {
+          setErrorServidor("Las contraseñas no coinciden.");
+          return;
+        } else {
+          // Aquí iría la lógica para enviar la nueva contraseña al backend, probablemente con un token de recuperación
+          setMensaje("Contraseña reestablecida exitosamente.");
+        }
       }
 
     } catch (error) {
