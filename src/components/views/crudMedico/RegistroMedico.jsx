@@ -97,7 +97,8 @@ const RegistroMedico = () => {
 
     } catch (error) {
 
-      if (error.response?.status === 400) {
+      // Errores de validación que enviamos desde el backend (status 400)
+      if (error.response?.status === 400 && error.response.data?.errores) {
         error.response.data.errores.forEach(err => {
           setError(err.campo, {
             type: "server",
@@ -107,7 +108,23 @@ const RegistroMedico = () => {
         return;
       }
 
+      // Si el backend devolvió data pero con otra forma
+      if (error.response?.data && typeof error.response.data === 'object') {
+        // opcional: chequeo seguro si hay mensaje plano
+        const msg = error.response.data.message || error.response.data.mensaje;
+        if (msg) {
+          Swal.fire({ title: "Error", text: msg, icon: "error" });
+          return;
+        }
+      }
+
+      // Error de red u otro inesperado
       console.error(error);
+      Swal.fire({
+        title: "Error",
+        text: "Ocurrió un error inesperado. Revisá la consola.",
+        icon: "error",
+      });
     }
   }
 
