@@ -6,8 +6,9 @@ import PaginacionTurnos from '../turnos/Paginacion.jsx';
 import Table from 'react-bootstrap/Table'
 import Swal from 'sweetalert2'
 import { useEffect } from "react";
-import { get } from 'react-hook-form';
 import { getRoleFromToken } from '../../helpers/login/apiLogin.js';
+import { obtenerNombreDesdeToken } from '../../helpers/login/apiLogin.js';
+import Dropdown from 'react-bootstrap/Dropdown'
 
 const TurnosList = () => {
     const [turnos, setTurnos] = useState([]);
@@ -16,32 +17,17 @@ const TurnosList = () => {
     const [turnoEdit, setTurnoEdit] = useState(null)
     const [paginaActual, setPaginaActual] = useState(1);
     const [cantPaginas, setCantPaginas] = useState(1);
-
     const role = getRoleFromToken();
-
+    const nombreUsuario = obtenerNombreDesdeToken();
     const isAdmin = role === "admin"
     const isUser = role === "paciente"
     const isMedico = role === "medico"
-
-
-    const pacientes = [
-        { id: 1, nombre: "Juan Perez" },
-        { id: 2, nombre: "Maria Gomez" },
-        { id: 3, nombre: "Carlos Lopez" }
-    ];
-
-
-    const medicos = [
-        { id: 1, nombre: "Dr. Smith" },
-        { id: 2, nombre: "Dra. Johnson" },
-        { id: 3, nombre: "Dr. Brown" }
-    ];
 
     const getNuevoEstado = () => {
         const role = getRoleFromToken();
 
         if (role === "medico") return "Cancelado por el médico";
-        if (role === "user") return "Cancelado por el paciente";
+        if (role === "paciente") return "Cancelado por el paciente";
         return "Cancelado";
     };
 
@@ -51,6 +37,27 @@ const TurnosList = () => {
         setTurnos(data.turnos);
         setPaginaActual(data.paginaActual);
         setCantPaginas(data.cantPaginas);
+    };
+
+    const ordenarTurnos = (criterio) => {
+        const ordenados = [...turnos].sort((a, b) => {
+            switch (criterio) {
+                case "fechaHora":
+                    return new Date(`${a.fecha} ${a.hora}`) -
+                        new Date(`${b.fecha} ${b.hora}`);
+
+                case "nombre":
+                    return a.pacienteNombre.localeCompare(b.pacienteNombre);
+
+                case "estado":
+                    return a.estado.localeCompare(b.estado);
+
+                default:
+                    return 0;
+            }
+        });
+
+        setTurnos(ordenados);
     };
 
 
@@ -87,7 +94,6 @@ const TurnosList = () => {
 
                 const nuevosTurnos = turnos.filter(t => t._id !== turno._id);
                 setTurnos(nuevosTurnos);
-                localStorage.setItem("turnos", JSON.stringify(nuevosTurnos));
 
                 Swal.fire({
                     title: "Eliminado",
@@ -119,25 +125,28 @@ const TurnosList = () => {
         });
 
         if (result.isConfirmed) {
-            const exito = await cancelarTurno(turno, getNuevoEstado());
+
+            const getNuevoEstado = () => {
+                const role = getRoleFromToken();
+                console.log("Role en getNuevoEstado:", role);
+                if (role === "medico") return "Cancelado por el médico";
+                if (role === "paciente") return "Cancelado por el paciente";
+                return "Cancelado";
+            };
+
+            const nuevoEstado = getNuevoEstado();
+
+            const exito = await cancelarTurno(turno, nuevoEstado);
+
             if (exito) {
 
-                const getNuevoEstado = () => {
-                    const role = getRoleFromToken();
-
-                    if (role === "medico") return "Cancelado por el médico";
-                    if (role === "user") return "Cancelado por el paciente";
-                    return "Cancelado";
-                };
-
                 const nuevosTurnos = turnos.map(t =>
-                    t.id === turno.id ? { ...t, estado: getNuevoEstado() } : t
+                    t._id === turno._id
+                        ? { ...t, estado: nuevoEstado }
+                        : t
                 );
 
                 setTurnos(nuevosTurnos);
-                localStorage.setItem("turnos", JSON.stringify(nuevosTurnos));
-
-
 
                 Swal.fire({
                     title: "Cancelado",
@@ -146,6 +155,7 @@ const TurnosList = () => {
                     timer: 2000,
                     showConfirmButton: false
                 });
+
             } else {
                 Swal.fire({
                     title: "Error",
@@ -173,13 +183,10 @@ const TurnosList = () => {
             if (exito) {
 
                 const nuevosTurnos = turnos.map(t =>
-                    t.id === turno.id ? { ...t, estado: "Atendido" } : t
+                    t._id === turno._id ? { ...t, estado: "Atendido" } : t
                 );
 
                 setTurnos(nuevosTurnos);
-                localStorage.setItem("turnos", JSON.stringify(nuevosTurnos));
-
-
 
                 Swal.fire({
                     title: "Atendido",
@@ -228,10 +235,10 @@ const TurnosList = () => {
                         return true
                     }
                 }}
-                pacientesMock={pacientes}
-                medicosMock={medicos}
                 turnos={turnos}
             />
+
+
             {isUser && (
                 <>
                     <Button
@@ -283,6 +290,17 @@ const TurnosList = () => {
 
 
             <div className="table-responsive">
+                <Dropdown className='mt-3'>
+                    <Dropdown.Toggle variant="dark" id="dropdown-basic">
+                        Ordenar
+                    </Dropdown.Toggle>
+
+                    <Dropdown.Menu>
+                        <Dropdown.Item onClick={() => ordenarTurnos("fechaHora")}>Ordenar por Fecha y Hora</Dropdown.Item>
+                        <Dropdown.Item onClick={() => ordenarTurnos("nombre")}>Ordenar por Nombre</Dropdown.Item>
+                        <Dropdown.Item onClick={() => ordenarTurnos("estado")}>Ordenar por Estado</Dropdown.Item>
+                    </Dropdown.Menu>
+                </Dropdown>
                 <Table striped bordered hover size="sm" className='mt-3' responsive>
                     <thead>
                         <tr>
@@ -304,13 +322,13 @@ const TurnosList = () => {
                         ) : (
                             turnos.map(t => (
                                 <tr key={t.id}>
-                                    <td>{t.pacienteNombre}</td>
-                                    <td>{t.medicoNombre}</td>
-                                    <td>{t.fecha}</td>
-                                    <td>{t.hora}</td>
-                                    <td>{t.motivoConsulta}</td>
-                                    <td>{t.estado}</td>
-                                    <td>{t.estadoPago}</td>
+                                    <td>{t?.pacienteNombre}</td>
+                                    <td>{t?.medicoNombre}</td>
+                                    <td>{t?.fecha}</td>
+                                    <td>{t?.hora}</td>
+                                    <td>{t?.motivoConsulta}</td>
+                                    <td>{t?.estado}</td>
+                                    <td>{t?.estadoPago}</td>
                                     <td>
                                         {isAdmin && (
                                             <>
@@ -352,19 +370,22 @@ const TurnosList = () => {
                                                 <i className="bi bi-check-all"></i>
                                             </Button>
                                         )}
-                                        {(isUser) || isMedico ? (
-                                            <Button
-                                                variant="danger"
-                                                disabled={t.estado === getNuevoEstado()}
-                                                onClick={() => {
-                                                    setMode(getNuevoEstado());
-                                                    setTurnoEdit(t);
-                                                    handleCancel(t);
-                                                }}
-                                            >
-                                                <i className="bi bi-x-circle-fill"></i>
-                                            </Button>
-                                        ) : null}
+                                        {(
+                                            (isUser && t.pacienteNombre === nombreUsuario) ||
+                                            (isMedico && t.medicoNombre === nombreUsuario)
+                                        ) && (
+                                                <Button
+                                                    variant="danger"
+                                                    disabled={t.estado.toLowerCase().includes("cancelado")}
+                                                    onClick={() => {
+                                                        setMode(getNuevoEstado());
+                                                        setTurnoEdit(t);
+                                                        handleCancel(t);
+                                                    }}
+                                                >
+                                                    <i className="bi bi-x-circle-fill"></i>
+                                                </Button>
+                                            )}
 
                                     </td>
 
