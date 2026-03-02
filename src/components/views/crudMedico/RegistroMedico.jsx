@@ -12,18 +12,18 @@ const RegistroMedico = () => {
 
   /* EDITAR */
   const [estoyEditando, setEstoyEditando] = useState(false)
-  const [medicoEditar, setMedicoEditar] = useState(null)  
+  const [medicoEditar, setMedicoEditar] = useState(null)
 
   /* VER */
   const [mostrarModal, setMostrarModal] = useState(false);
   const [medicoSeleccionado, setMedicoSeleccionado] = useState(null);
 
-  const verDetalleMedico = (medico) =>{
+  const verDetalleMedico = (medico) => {
     setMedicoSeleccionado(medico);
     setMostrarModal(true)
   };
 
-  const handleCloseModal = () =>{
+  const handleCloseModal = () => {
     setMostrarModal(false)
     setMedicoSeleccionado(null)
   }
@@ -32,15 +32,14 @@ const RegistroMedico = () => {
     register,
     handleSubmit,
     reset,
-    formState:{errors},
+    formState: { errors },
     getValues,
-    setValue
+    setValue,
+    setError
   } = useForm()
 
-  // 🔥 Ahora viene del backend
   const [medicos, setMedicos] = useState([]);
 
-  // 🔥 Cargar doctores al iniciar
   useEffect(() => {
     const cargarDoctores = async () => {
       try {
@@ -53,12 +52,11 @@ const RegistroMedico = () => {
     cargarDoctores();
   }, []);
 
-  // Función principal que maneja CREAR y EDITAR
   const crearYEditar = async (data) => {
 
     try {
 
-      if(estoyEditando) {
+      if (estoyEditando) {
 
         const doctorActualizado = {
           ...data,
@@ -78,18 +76,18 @@ const RegistroMedico = () => {
         const nuevoMedico = {
           ...data,
           role: "medico"
-        };  
+        };
 
         await crearDoctor(nuevoMedico);
 
         Swal.fire({
           title: "Creaste un usuario!",
-          text: `${data.nombre_y_apellido_medico} esta habilitado.`,
+          text: `${data.nombre_y_apellido} esta habilitado.`,
           icon: "success",
         });
+
       }
 
-      // 🔥 Refrescar lista desde backend
       const listaActualizada = await listarDoctores();
       setMedicos(listaActualizada);
 
@@ -98,7 +96,35 @@ const RegistroMedico = () => {
       reset();
 
     } catch (error) {
+
+      // Errores de validación que enviamos desde el backend (status 400)
+      if (error.response?.status === 400 && error.response.data?.errores) {
+        error.response.data.errores.forEach(err => {
+          setError(err.campo, {
+            type: "server",
+            message: err.mensaje
+          });
+        });
+        return;
+      }
+
+      // Si el backend devolvió data pero con otra forma
+      if (error.response?.data && typeof error.response.data === 'object') {
+        // opcional: chequeo seguro si hay mensaje plano
+        const msg = error.response.data.message || error.response.data.mensaje;
+        if (msg) {
+          Swal.fire({ title: "Error", text: msg, icon: "error" });
+          return;
+        }
+      }
+
+      // Error de red u otro inesperado
       console.error(error);
+      Swal.fire({
+        title: "Error",
+        text: "Ocurrió un error inesperado. Revisá la consola.",
+        icon: "error",
+      });
     }
   }
 
@@ -108,7 +134,7 @@ const RegistroMedico = () => {
       (medico) => medico._id === id
     );
 
-    if(medicoSeleccionado){
+    if (medicoSeleccionado) {
 
       setEstoyEditando(true);
       setMedicoEditar(id);
@@ -195,7 +221,7 @@ const RegistroMedico = () => {
             <div className="containerLabelControl">
               <Form.Label className="col-5 col-md-4">Especialidad</Form.Label>
               <Form.Select {...register("especialidad", {
-                required:"Tienes que ingresar una opción"
+                required: "Tienes que ingresar una opción"
               })}>
                 <option value="">Seleccione una opción</option>
                 <option value="Clinica Gral">Clinica Gral</option>
@@ -208,7 +234,7 @@ const RegistroMedico = () => {
             <Form.Text className="text-danger">
               {errors.especialidad?.message}
             </Form.Text>
-          </Form.Group>    
+          </Form.Group>
 
           <Form.Group className="mb-3">
             <div className="containerLabelControl">
@@ -238,6 +264,9 @@ const RegistroMedico = () => {
                 })}
               />
             </div>
+            <Form.Text className="text-danger">
+              {errors.contraseña?.message}
+            </Form.Text>
           </Form.Group>
 
           <Form.Group className="mb-3">
@@ -253,9 +282,12 @@ const RegistroMedico = () => {
                 })}
               />
             </div>
+            <Form.Text className="text-danger">
+              {errors.contraseña_confirmar?.message}
+            </Form.Text>
           </Form.Group>
 
-          <Button variant={estoyEditando? "warning" : "success"} type="submit">
+          <Button variant={estoyEditando ? "warning" : "success"} type="submit">
             {estoyEditando ? "Guardar Cambios" : "Registrar"}
           </Button>
 

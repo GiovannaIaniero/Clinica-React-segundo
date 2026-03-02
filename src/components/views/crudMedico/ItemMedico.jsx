@@ -17,11 +17,7 @@ const ItemMedico = ({ medico, borrarMedico, modificarMedico, verDetalleMedico })
           src="https://img.freepik.com/free-vector/doctor-character-background_1270-84.jpg"
         />
         <Card.Body>
-          <Card.Title>Dr/a {medico.nombre_y_apellido_medico}</Card.Title>
-
-          <Card.Text className='mt-4'>
-            Especialidad: {medico.especialidad}
-          </Card.Text>
+          <Card.Title>Dr/a {medico.nombre_y_apellido}</Card.Title>
 
           <Card.Text>
             Email: {medico.email}

@@ -86,7 +86,6 @@ const CrearTurno = ({
 
         setError("");
 
-        // 👤 SI ES USUARIO → ir a pantalla de pago
         if (isUser && form.metodoPago === "tarjeta") {
             navigate("/pago", {
                 state: form
@@ -94,7 +93,6 @@ const CrearTurno = ({
             return;
         }
 
-        // 👨‍⚕️ ADMIN / MÉDICO → flujo original
         const success = await onSave(form);
 
         if (success) {

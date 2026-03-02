@@ -8,8 +8,8 @@ const ItemPacientes = ({ paciente, borrarPaciente, modificarPaciente, verDetalle
       <Card className="shadow-lg patient-card col-md-12">
         <Card.Img
           variant="top"
-          className="patient-card-img"
-          src="https://img.freepik.com/free-vector/doctor-character-background_1270-84.jpg"
+          className="patient-card-img w-100 h-100"
+          src="https://img.freepik.com/vector-premium/icono-perfil-usuario-estilo-plano-ilustracion-vector-avatar-miembro-sobre-fondo-aislado-concepto-negocio-signo-permiso-humano_157943-15752.jpg?semt=ais_hybrid&w=740&q=80"
         />
         <Card.Body>
           <Card.Title>Paciente: {paciente.nombre_y_apellido}</Card.Title>
@@ -19,31 +19,24 @@ const ItemPacientes = ({ paciente, borrarPaciente, modificarPaciente, verDetalle
           <Card.Text><strong>Email:</strong> {paciente.email}</Card.Text>
 
           <div className="d-flex justify-content-center align-items-center gap-2 mt-3">
-
-            {/* VER DETALLE */}
             <Button
               variant="info"
               onClick={() => verDetallePaciente(paciente)}
             >
               <FaEye />
             </Button>
-
-            {/* EDITAR - ahora pasa _id */}
             <Button
               variant="warning"
               onClick={() => modificarPaciente(paciente._id)}
             >
               <FaPencilAlt />
             </Button>
-
-            {/* ELIMINAR - ahora pasa _id */}
             <Button
               variant="danger"
               onClick={() => borrarPaciente(paciente._id)}
             >
               <FaTrash />
             </Button>
-
           </div>
         </Card.Body>
       </Card>

@@ -54,37 +54,56 @@ const RegistrarPaciente = () => {
     cargarPacientes();
   }, []);
   const crearYEditar = async (data) => {
-    if (estoyEditando) {
-      const pacienteActualizado = {
-        ...data,
-        _id: pacienteEditar
-      };
-      const ok = await editarPaciente(pacienteActualizado);
-      if (ok) {
-        Swal.fire({
-          title: "Paciente Actualizado!",
-          text: `${data.nombre_y_apellido} ha sido modificado.`,
-          icon: "success",
-        });
-        const listaActualizada = await obtenerPacientes();
-        setPacientes(listaActualizada);
-      }
-      setEstoyEditando(false)
-      setPacienteEditar(null)
-    } else {
-      const ok = await crearPaciente(data);
-      if (ok) {
+    try {
+      if (estoyEditando) {
+        const pacienteActualizado = {
+          ...data,
+          _id: pacienteEditar
+        };
+        const ok = await editarPaciente(pacienteActualizado);
+        if (ok) {
+          Swal.fire({
+            title: "Paciente Actualizado!",
+            text: `${data.nombre_y_apellido} ha sido modificado.`,
+            icon: "success",
+          });
+          const listaActualizada = await obtenerPacientes();
+          setPacientes(listaActualizada);
+        }
+        setEstoyEditando(false);
+        setPacienteEditar(null);
+        reset();
+      } else {
+        const result = await crearPaciente(data); // ahora lanza si backend devolvió error
+
         Swal.fire({
           title: "Creaste un usuario!",
           text: `${data.nombre_y_apellido} esta habilitado.`,
           icon: "success",
         });
+
         const listaActualizada = await obtenerPacientes();
         setPacientes(listaActualizada);
+        reset();
+      }
+    } catch (err) {
+      Swal.fire({
+        title: "Error",
+        text: err.message,
+        icon: "error",
+      });
+
+      // 👇 Mostrar error debajo del input automáticamente
+      if (Array.isArray(err.server)) {
+        err.server.forEach((error) => {
+          setError(error.path, {
+            type: "server",
+            message: error.msg,
+          });
+        });
       }
     }
-    reset();
-  }
+  };
   const modificarPaciente = (id) => {
     const pacienteSeleccionado = pacientes.find(
       (paciente) => paciente._id === id

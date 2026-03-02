@@ -1,26 +1,35 @@
-
 const doctoresBackend = import.meta.env.VITE_API_DOCTORES;
 
-// Crear
 export const crearDoctor = async (doctor) => {
-  const respuesta = await fetch(doctoresBackend, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(doctor),
-  });
+  try {
+    const respuesta = await fetch(doctoresBackend, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(doctor),
+    });
 
-  if (!respuesta.ok) throw new Error("Error al crear doctor");
-  return await respuesta.json();
+    const data = await respuesta.json();
+
+    if (!respuesta.ok) {
+      // crea un Error y le agrego una propiedad response con status y data
+      const err = new Error("Error al crear doctor");
+      err.response = { status: respuesta.status, data };
+      throw err;
+    }
+
+    return data;
+  } catch (error) {
+    // Si es un error de red (fetch) lo relanzo para que el caller lo maneje
+    throw error;
+  }
 };
 
-// Listar
 export const listarDoctores = async () => {
   const respuesta = await fetch(doctoresBackend);
   if (!respuesta.ok) throw new Error("Error al listar doctores");
   return await respuesta.json();
 };
 
-// Editar
 export const editarDoctor = async (doctor) => {
   const respuesta = await fetch(`${doctoresBackend}/${doctor._id}`, {
     method: "PUT",
@@ -32,7 +41,6 @@ export const editarDoctor = async (doctor) => {
   return await respuesta.json();
 };
 
-// Borrar
 export const borrarDoctor = async (doctor) => {
   const respuesta = await fetch(`${doctoresBackend}/${doctor._id}`, {
     method: "DELETE",
@@ -41,5 +49,3 @@ export const borrarDoctor = async (doctor) => {
   if (!respuesta.ok) throw new Error("Error al eliminar doctor");
   return true;
 };
-
-

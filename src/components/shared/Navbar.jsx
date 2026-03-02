@@ -1,6 +1,5 @@
 import { Navbar, Nav, NavDropdown, Container } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
 import { getRoleFromToken } from '../../helpers/login/apiLogin.js';
 import { useNavigate } from "react-router";
 

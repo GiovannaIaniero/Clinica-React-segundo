@@ -6,19 +6,28 @@ export const obtenerPacientes = async () => {
 };
 
 export const crearPaciente = async (paciente) => {
-
-  const pacienteEnviar = {
-    ...paciente,
-    confirmarContraseña: paciente.contraseña_confirmar
-  };
-
-  const res = await fetch(pacientesBackend, {
+  const respuesta = await fetch(pacientesBackend, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(pacienteEnviar)
+    body: JSON.stringify(paciente)
   });
 
-  return res.ok;
+  const data = await respuesta.json();
+
+  if (!respuesta.ok) {
+    // 👇 si viene array de errores de express-validator
+    if (Array.isArray(data)) {
+      const error = new Error(data[0].msg);
+      error.server = data;
+      throw error;
+    }
+
+    const error = new Error(data.mensaje || "Error al crear paciente");
+    error.server = data;
+    throw error;
+  }
+
+  return data;
 };
 
 export const editarPaciente = async (paciente) => {
@@ -30,7 +39,8 @@ export const editarPaciente = async (paciente) => {
 
   const res = await fetch(`${pacientesBackend}/${paciente._id}`, {
     method: "PUT",
-    headers: { "Content-Type": "application/json",
+    headers: {
+      "Content-Type": "application/json",
       "Authorization": `Bearer ${localStorage.getItem("token")}`
     },
     body: JSON.stringify(pacienteEnviar),
