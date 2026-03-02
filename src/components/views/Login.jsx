@@ -129,7 +129,7 @@ const Login = ({ onLogin }) => {
             </Form>
             <div className="text-center mt-3">
               <Link
-                to="/recuperar-password"
+                to="/forgot-password"
                 className="text-decoration-none"
               >
                 ¿Olvidaste tu contraseña?

@@ -34,8 +34,9 @@ function App() {
             <Route path='/guardia-medica' element={role === "medico" || role === "admin" ? <GuardiaMedica /> : <Navigate to="/login" />} />
             <Route path='/turnos' element={<TurnosList />} />
             <Route path='/login' element={<Login />} />
-            <Route path='/recuperar-password' element={<RecuperarPassword />} />
-            <Route path='/historiaClinica' element={role === "medico" || role === "admin" ? <HistoriaClinica /> : <Navigate to="/login" />} />
+            <Route path='/forgot-password' element={<RecuperarPassword type="forgot" />} />
+            <Route path="/reset-password/:token" element={<RecuperarPassword type="reset" />} />
+            <Route path='/historiaClinica' element={role === "medico" ? <HistoriaClinica /> : <Navigate to="/login" />} />
             <Route path='/registroMedico' element={<RegistroMedico />} />
             <Route path="pago" element={role === "paciente" ? <Pago /> : <Navigate to="/login" />} />
 
