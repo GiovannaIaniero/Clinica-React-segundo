@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { crearTurno, editarTurno, borrarTurno, cancelarTurno, obtenerTurnosPaginados } from "../../helpers/turnos/apiTurnos.js";
-import { Button } from 'react-bootstrap'
+import { Button, Badge } from 'react-bootstrap'
 import CrearTurno from '../turnos/CrearTurno.jsx';
 import PaginacionTurnos from '../turnos/Paginacion.jsx';
 import Table from 'react-bootstrap/Table'
@@ -18,7 +18,6 @@ const TurnosList = () => {
     const [paginaActual, setPaginaActual] = useState(1);
     const [cantPaginas, setCantPaginas] = useState(1);
     const role = getRoleFromToken();
-    const [vista, setVista] = useState("global");
     const nombreUsuario = obtenerNombreDesdeToken();
     const isAdmin = role === "admin"
     const isUser = role === "paciente"
@@ -258,7 +257,7 @@ const TurnosList = () => {
     return (
         <div>
             <h1>Turnos</h1>
-           
+
             <CrearTurno
                 show={show}
                 onClose={() => setShow(false)}
@@ -330,7 +329,7 @@ const TurnosList = () => {
                         <Dropdown.Item onClick={() => ordenarTurnos("estado")}>Ordenar por Estado</Dropdown.Item>
                     </Dropdown.Menu>
                 </Dropdown>
-                <Table striped bordered hover size="sm" className='mt-3' responsive>
+                <Table striped bordered hover size="sm" className='mt-3' responsive variant='white'>
                     <thead>
                         <tr>
                             <th>Paciente</th>
@@ -353,11 +352,34 @@ const TurnosList = () => {
                                 <tr key={t.id}>
                                     <td>{t?.pacienteNombre}</td>
                                     <td>{t?.medicoNombre}</td>
-                                    <td>{t?.fecha}</td>
+                                    <td>
+                                        {new Date(t.fecha).toLocaleDateString("es-AR", {
+                                            day: "2-digit",
+                                            month: "2-digit",
+                                            year: "numeric"
+                                        })}
+                                    </td>
                                     <td>{t?.hora}</td>
-                                    <td>{t?.motivoConsulta}</td>
-                                    <td>{t?.estado}</td>
-                                    <td>{t?.estadoPago}</td>
+                                    <td className="text-truncate" style={{ maxWidth: "300px" }}>
+                                        {t.motivoConsulta}
+                                    </td>
+                                    <td>
+                                        <Badge bg={
+                                            t.estado === "Atendido"
+                                                ? "success"
+                                                : t.estado.toLowerCase().includes("cancelado")
+                                                    ? "danger"
+                                                    : "warning"
+                                        }>
+                                            {t.estado}
+                                        </Badge>
+                                    </td>
+
+                                    <td>
+                                        <Badge bg={t.estadoPago === "Pagado" ? "success" : "secondary"}>
+                                            {t.estadoPago}
+                                        </Badge>
+                                    </td>
                                     <td>
                                         {isAdmin && (
                                             <>
