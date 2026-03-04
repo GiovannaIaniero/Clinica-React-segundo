@@ -122,6 +122,6 @@ export const validarTurnoCompleto = (
   if (conflicto) {
     return `El médico ya tiene un turno de ${conflicto.hora} a ${conflicto.horaFin}.`;
   }
-
+  
   return null;
 };

@@ -205,6 +205,29 @@ const TurnosList = () => {
         }
     };
 
+    const handleSave = async (nuevoTurno) => {
+        if (mode === "crear") {
+            const turnoGuardado = await crearTurno(nuevoTurno);
+            setTurnos(prev => [...prev, turnoGuardado]);
+            return turnoGuardado;
+        }
+
+        if (mode === "editar" && turnoEdit) {
+            const turnoActualizado = await editarTurno({
+                ...nuevoTurno,
+                _id: turnoEdit._id
+            });
+
+            setTurnos(prev =>
+                prev.map(t =>
+                    t._id === turnoEdit._id ? turnoActualizado : t
+                )
+            );
+
+            return turnoActualizado;
+        }
+    };
+
     return (
         <div>
             <h1>Turnos</h1>
@@ -213,28 +236,7 @@ const TurnosList = () => {
                 onClose={() => setShow(false)}
                 mode={mode}
                 turnoEdit={turnoEdit}
-                onSave={async (nuevoTurno) => {
-
-                    if (mode === "crear") {
-                        const turnoGuardado = await crearTurno(nuevoTurno);
-                        setTurnos([...turnos, turnoGuardado]);
-                        console.log("Turno creado:", turnoGuardado)
-                        return true;
-
-                    } else if (mode === "editar" && turnoEdit) {
-                        const turnoActualizado = await editarTurno({
-                            ...nuevoTurno,
-                            _id: turnoEdit._id
-                        });
-                        setTurnos(prev =>
-                            prev.map(t =>
-                                t._id === turnoEdit._id ? turnoActualizado : t
-                            )
-                        );
-                        console.log("Turno actualizado:", turnoActualizado);
-                        return true
-                    }
-                }}
+                onSave={handleSave}
                 turnos={turnos}
             />
 

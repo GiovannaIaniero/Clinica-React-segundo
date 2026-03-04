@@ -10,13 +10,15 @@ export const crearTurno = async (turno) => {
       body: JSON.stringify(turno),
     });
 
+    const data = await respuesta.json();
+
     if (!respuesta.ok) {
-      throw new Error("Error al crear turno");
+      // 👇 devolvemos los errores reales del backend
+      throw data;
     }
 
-    return await respuesta.json();
+    return data
   } catch (error) {
-    console.error("Error en crearTurno:", error.message);
     throw error;
   }
 };
