@@ -5,10 +5,11 @@ import { Link } from "react-router";
 import { Container, Row, Col } from "react-bootstrap";
 import { getRoleFromToken } from "../../../helpers/login/apiLogin";
 
+
 const Home = () => {
   const role = getRoleFromToken()
   console.log("Role:", role);
-  
+
   return (
     <>
       <img src="/img/clinica.jpg" alt="Imagen Clinica" className='clinica-img ' />
@@ -128,33 +129,25 @@ const Home = () => {
           {role === null && (
             <Card className="op-card shadow-sm border-0 p-4">
               <div className="op-icon icon-orange">
-                <i className="bi bi-hospital"></i>
+                <i className="bi bi-envelope"></i>
               </div>
-              <h4 className="mt-3 fw-bold text-warning"> ¿Usuario o Profesional?</h4>
-              <p className="my-4 px-3 fw-bold">Accede a nuestro servicio</p>
-              <Row className="g-3">
-                <Col>
-                  <Button
-                    variant="warning"
-                    className="fw-bold w-100"
-                    as={Link}
-                    to="/registroMedico"
-                  >
-                    Profesional
-                  </Button>
-                </Col>
 
-                <Col>
-                  <Button
-                    variant="warning"
-                    className="fw-bold w-100"
-                    as={Link}
-                    to="/registrarPaciente"
-                  >
-                    Paciente
-                  </Button>
-                </Col>
-              </Row>
+              <h4 className="mt-3 fw-bold text-warning">
+                ¿Necesitás ayuda?
+              </h4>
+
+              <p className="my-4 px-3 fw-bold">
+                Ponete en contacto con nuestro equipo.
+              </p>
+
+              <Button
+                variant="warning"
+                className="fw-bold w-100"
+                as={Link}
+                to="/contacto"
+              >
+                Contacto
+              </Button>
             </Card>
           )}
 
@@ -200,7 +193,7 @@ const Home = () => {
 
       </Row >
 
-      <div className="bg-light py-5 my-5">
+      <div className="bg-light py-1 my-5">
         <Container className="text-center">
 
           <h2 className=" horarios-titulo fw-bold "  >Horarios de Atención</h2>

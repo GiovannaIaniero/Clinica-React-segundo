@@ -36,7 +36,7 @@ export const login = async (email, contrase\u00f1a) => {
       }
 
       if (!respuesta.ok) {
-        throw new Error(data?.mensaje || raw || "Error al iniciar sesi\u00f3n");
+        throw new Error(data?.mensaje || raw );
       }
 
       if (data?.token) return data;
@@ -51,10 +51,7 @@ export const login = async (email, contrase\u00f1a) => {
     }
   }
 
-  const local = loginFallbackLocal(email, contrase\u00f1a);
-  if (local) return local;
-
-  return { error: "Credenciales inv\u00e1lidas" };
+  return { error: " - Credenciales inv\u00e1lidas" };
 };
 
 export const getRoleFromToken = () => {

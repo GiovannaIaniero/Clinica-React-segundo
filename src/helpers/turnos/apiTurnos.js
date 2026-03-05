@@ -102,9 +102,13 @@ export const obtenerTurnos = async () => {
 
 export const obtenerTurnosPaginados = async (page = 1, limit = 10) => {
   try {
-    const respuesta = await fetch(
-      `${turnosBackend}/paginacion?page=${page}&limit=${limit}`
-    );
+    const token = localStorage.getItem("token"); // 👈 FALTABA ESTO
+    const respuesta = await fetch(`${turnosBackend}/paginacion?page=${page}&limit=${limit}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+    });
 
     if (!respuesta.ok) {
       throw new Error("Error al obtener turnos paginados");

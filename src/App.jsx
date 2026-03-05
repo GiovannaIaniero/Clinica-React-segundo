@@ -15,6 +15,9 @@ import Error404 from './components/views/Error404.jsx'
 import Pago from './components/turnos/Pagos.jsx'
 import { getRoleFromToken } from './helpers/login/apiLogin.js';
 import RecuperarPassword from './components/views/RecuperarPassword.jsx';
+import ScrollToTop from './components/views/Home/ScrollToTop.jsx'
+import Contacto from "./components/views/Contacto.jsx"
+import Servicios from "./components/views/Servicios.jsx"
 
 function App() {
 
@@ -24,12 +27,16 @@ function App() {
     <div className='div-principal'>
       <BrowserRouter>
 
+        <ScrollToTop />
+
         <Navbar />
 
         <main className='my-5'>
           <Routes>
             <Route path='' element={<Home />} />
             <Route path='/' element={<Home />} />
+            <Route path="/servicios" element={<Servicios />} />
+            <Route path="/contacto" element={<Contacto />} />
             <Route path='/registrarPaciente' element={<RegistrarPaciente />} />
             <Route path='/guardia-medica' element={role === "medico" || role === "admin" ? <GuardiaMedica /> : <Navigate to="/login" />} />
             <Route path='/turnos' element={<TurnosList />} />

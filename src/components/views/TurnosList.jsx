@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { crearTurno, editarTurno, borrarTurno, cancelarTurno, obtenerTurnosPaginados } from "../../helpers/turnos/apiTurnos.js";
-import { Button } from 'react-bootstrap'
+import { Button, Badge } from 'react-bootstrap'
 import CrearTurno from '../turnos/CrearTurno.jsx';
 import PaginacionTurnos from '../turnos/Paginacion.jsx';
 import Table from 'react-bootstrap/Table'
 import Swal from 'sweetalert2'
-import { useEffect } from "react";
+import { useEffect} from "react";
+import { Link } from "react-router-dom";
 import { getRoleFromToken } from '../../helpers/login/apiLogin.js';
 import { obtenerNombreDesdeToken } from '../../helpers/login/apiLogin.js';
 import Dropdown from 'react-bootstrap/Dropdown'
@@ -206,31 +207,58 @@ const TurnosList = () => {
     };
 
     const handleSave = async (nuevoTurno) => {
-        if (mode === "crear") {
-            const turnoGuardado = await crearTurno(nuevoTurno);
-            setTurnos(prev => [...prev, turnoGuardado]);
-            return turnoGuardado;
-        }
+        try {
+            if (mode === "crear") {
+                const turnoGuardado = await crearTurno(nuevoTurno);
 
-        if (mode === "editar" && turnoEdit) {
-            const turnoActualizado = await editarTurno({
-                ...nuevoTurno,
-                _id: turnoEdit._id
+                setTurnos(prev => [...prev, turnoGuardado]);
+
+                await Swal.fire({
+                    icon: "success",
+                    title: "Turno creado",
+                    text: "El turno se creó correctamente",
+                    confirmButtonColor: "#3085d6"
+                });
+
+                return turnoGuardado;
+            }
+
+            if (mode === "editar" && turnoEdit) {
+                const turnoActualizado = await editarTurno({
+                    ...nuevoTurno,
+                    _id: turnoEdit._id
+                });
+
+                setTurnos(prev =>
+                    prev.map(t =>
+                        t._id === turnoEdit._id ? turnoActualizado : t
+                    )
+                );
+
+                await Swal.fire({
+                    icon: "success",
+                    title: "Turno actualizado",
+                    text: "Los cambios se guardaron correctamente",
+                    confirmButtonColor: "#3085d6"
+                });
+
+                return turnoActualizado;
+            }
+        } catch (error) {
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Ocurrió un problema al guardar el turno"
             });
 
-            setTurnos(prev =>
-                prev.map(t =>
-                    t._id === turnoEdit._id ? turnoActualizado : t
-                )
-            );
-
-            return turnoActualizado;
+            console.error(error);
         }
     };
 
     return (
         <div>
             <h1>Turnos</h1>
+
             <CrearTurno
                 show={show}
                 onClose={() => setShow(false)}
@@ -289,119 +317,174 @@ const TurnosList = () => {
                     Contactar soporte
                 </Button>
             )}
+            {role === null ? (
+                <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "60vh" }}>
+                    <div className="text-center p-5 shadow rounded bg-light" style={{ maxWidth: "500px" }}>
 
+                        <i
+                            className="bi bi-lock-fill warning mb-3"
+                            style={{ fontSize: "3rem" }}
+                        ></i>
 
-            <div className="table-responsive">
-                <Dropdown className='mt-3'>
-                    <Dropdown.Toggle variant="dark" id="dropdown-basic">
-                        Ordenar
-                    </Dropdown.Toggle>
+                        <h3 className="fw-bold mb-3">
+                            Acceso restringido
+                        </h3>
 
-                    <Dropdown.Menu>
-                        <Dropdown.Item onClick={() => ordenarTurnos("fechaHora")}>Ordenar por Fecha y Hora</Dropdown.Item>
-                        <Dropdown.Item onClick={() => ordenarTurnos("nombre")}>Ordenar por Nombre</Dropdown.Item>
-                        <Dropdown.Item onClick={() => ordenarTurnos("estado")}>Ordenar por Estado</Dropdown.Item>
-                    </Dropdown.Menu>
-                </Dropdown>
-                <Table striped bordered hover size="sm" className='mt-3' responsive>
-                    <thead>
-                        <tr>
-                            <th>Paciente</th>
-                            <th>Médico</th>
-                            <th>Fecha</th>
-                            <th>Hora</th>
-                            <th>Motivo de Consulta</th>
-                            <th>Estado</th>
-                            <th>Estado de Pago</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {turnos.length === 0 ? (
-                            <tr>
-                                <td colSpan="6" className="text-center">No hay turnos disponibles</td>
-                            </tr>
-                        ) : (
-                            turnos.map(t => (
-                                <tr key={t.id}>
-                                    <td>{t?.pacienteNombre}</td>
-                                    <td>{t?.medicoNombre}</td>
-                                    <td>{t?.fecha}</td>
-                                    <td>{t?.hora}</td>
-                                    <td>{t?.motivoConsulta}</td>
-                                    <td>{t?.estado}</td>
-                                    <td>{t?.estadoPago}</td>
-                                    <td>
-                                        {isAdmin && (
-                                            <>
-                                                <Button
-                                                    variant="dark"
-                                                    className="me-2"
-                                                    onClick={() => {
-                                                        setMode("editar");
-                                                        setTurnoEdit(t);
-                                                        setShow(true);
-                                                    }}
-                                                >
-                                                    <i className="bi bi-pen-fill"></i>
-                                                </Button>
+                        <p className="text-muted mb-4">
+                            Debe iniciar sesión para poder visualizar y gestionar sus turnos médicos.
+                        </p>
 
-                                                <Button
-                                                    variant="danger"
-                                                    onClick={() => {
-                                                        setMode("eliminar");
-                                                        setTurnoEdit(t);
-                                                        handleDelete(t);
-                                                    }}
-                                                >
-                                                    <i className="bi bi-person-x"></i>
-                                                </Button>
-                                            </>
-                                        )}
-                                        {isMedico && (
-                                            <Button
-                                                variant="success"
-                                                className='me-2'
-                                                disabled={t.estado === "Atendido"}
-                                                onClick={() => {
-                                                    setMode("atendido");
-                                                    setTurnoEdit(t);
-                                                    handleSuccess(t);
-                                                }}
-                                            >
-                                                <i className="bi bi-check-all"></i>
-                                            </Button>
-                                        )}
-                                        {(
-                                            (isUser && t.pacienteNombre === nombreUsuario) ||
-                                            (isMedico && t.medicoNombre === nombreUsuario)
-                                        ) && (
-                                                <Button
-                                                    variant="danger"
-                                                    disabled={t.estado.toLowerCase().includes("cancelado")}
-                                                    onClick={() => {
-                                                        setMode(getNuevoEstado());
-                                                        setTurnoEdit(t);
-                                                        handleCancel(t);
-                                                    }}
-                                                >
-                                                    <i className="bi bi-x-circle-fill"></i>
-                                                </Button>
-                                            )}
+                        <Button
+                            variant="success"
+                            className="fw-bold px-4"
+                            as={Link}
+                            to="/login"
+                        >
+                            <i className="bi bi-box-arrow-in-right me-2"></i>
+                            Ir a Iniciar Sesión
+                        </Button>
 
-                                    </td>
+                    </div>
+                </div>
 
+            ) : (
+                <>
+                    <div className="table-responsive">
+                        <Dropdown className='mt-3'>
+                            <Dropdown.Toggle variant="dark" id="dropdown-basic">
+                                Ordenar
+                            </Dropdown.Toggle>
+
+                            <Dropdown.Menu>
+                                <Dropdown.Item onClick={() => ordenarTurnos("fechaHora")}>Ordenar por Fecha y Hora</Dropdown.Item>
+                                <Dropdown.Item onClick={() => ordenarTurnos("nombre")}>Ordenar por Nombre</Dropdown.Item>
+                                <Dropdown.Item onClick={() => ordenarTurnos("estado")}>Ordenar por Estado</Dropdown.Item>
+                            </Dropdown.Menu>
+                        </Dropdown>
+                        <Table striped bordered hover size="sm" className='mt-3' responsive variant='white'>
+                            <thead>
+                                <tr>
+                                    <th>Paciente</th>
+                                    <th>Médico</th>
+                                    <th>Fecha</th>
+                                    <th>Hora</th>
+                                    <th>Motivo de Consulta</th>
+                                    <th>Estado</th>
+                                    <th>Estado de Pago</th>
+                                    <th>Acciones</th>
                                 </tr>
-                            ))
-                        )}
-                    </tbody>
-                </Table>
-            </div>
-            <PaginacionTurnos
-                paginaActual={paginaActual}
-                cantPaginas={cantPaginas}
-                onPageChange={cambiarPagina}
-            />
+                            </thead>
+                            <tbody>
+                                {turnos.length === 0 ? (
+                                    <tr>
+                                        <td colSpan="6" className="text-center">No hay turnos disponibles</td>
+                                    </tr>
+                                ) : (
+                                    turnos.map(t => (
+                                        <tr key={t.id}>
+                                            <td>{t?.pacienteNombre}</td>
+                                            <td>{t?.medicoNombre}</td>
+                                            <td>
+                                                {new Date(t.fecha).toLocaleDateString("es-AR", {
+                                                    day: "2-digit",
+                                                    month: "2-digit",
+                                                    year: "numeric"
+                                                })}
+                                            </td>
+                                            <td>{t?.hora}</td>
+                                            <td className="text-truncate" style={{ maxWidth: "300px" }}>
+                                                {t.motivoConsulta}
+                                            </td>
+                                            <td>
+                                                <Badge bg={
+                                                    t.estado === "Atendido"
+                                                        ? "success"
+                                                        : t.estado.toLowerCase().includes("cancelado")
+                                                            ? "danger"
+                                                            : "warning"
+                                                }>
+                                                    {t.estado}
+                                                </Badge>
+                                            </td>
+
+                                            <td>
+                                                <Badge bg={t.estadoPago === "Pagado" ? "success" : "secondary"}>
+                                                    {t.estadoPago}
+                                                </Badge>
+                                            </td>
+                                            <td>
+                                                {isAdmin && (
+                                                    <>
+                                                        <Button
+                                                            variant="dark"
+                                                            className="me-2"
+                                                            onClick={() => {
+                                                                setMode("editar");
+                                                                setTurnoEdit(t);
+                                                                setShow(true);
+                                                            }}
+                                                        >
+                                                            <i className="bi bi-pen-fill"></i>
+                                                        </Button>
+
+                                                        <Button
+                                                            variant="danger"
+                                                            onClick={() => {
+                                                                setMode("eliminar");
+                                                                setTurnoEdit(t);
+                                                                handleDelete(t);
+                                                            }}
+                                                        >
+                                                            <i className="bi bi-person-x"></i>
+                                                        </Button>
+                                                    </>
+                                                )}
+                                                {(isMedico && t.medicoNombre === nombreUsuario) && (
+                                                    <Button
+                                                        variant="success"
+                                                        className='me-2'
+                                                        disabled={t.estado === "Atendido"}
+                                                        onClick={() => {
+                                                            setMode("atendido");
+                                                            setTurnoEdit(t);
+                                                            handleSuccess(t);
+                                                        }}
+                                                    >
+                                                        <i className="bi bi-check-all"></i>
+                                                    </Button>
+                                                )}
+
+                                                {(
+                                                    (isUser && t.pacienteNombre === nombreUsuario) ||
+                                                    (isMedico && t.medicoNombre === nombreUsuario)
+                                                ) && (
+                                                        <Button
+                                                            variant="danger"
+                                                            disabled={t.estado.toLowerCase().includes("cancelado")}
+                                                            onClick={() => {
+                                                                setMode(getNuevoEstado());
+                                                                setTurnoEdit(t);
+                                                                handleCancel(t);
+                                                            }}
+                                                        >
+                                                            <i className="bi bi-x-circle-fill"></i>
+                                                        </Button>
+                                                    )}
+                                            </td>
+
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </Table>
+                    </div>
+                    <PaginacionTurnos
+                        paginaActual={paginaActual}
+                        cantPaginas={cantPaginas}
+                        onPageChange={cambiarPagina}
+                    />
+                </>
+            )}
         </div>
     )
 }

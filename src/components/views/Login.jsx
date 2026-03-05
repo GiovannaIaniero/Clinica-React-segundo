@@ -26,6 +26,7 @@ const Login = ({ onLogin }) => {
   const onSubmit = async (data) => {
     try {
       const result = await login(data.email, data.contraseña);
+      
 
       if (result.error) {
         setLoginError(result.error);
@@ -48,7 +49,6 @@ const Login = ({ onLogin }) => {
 
     } catch (error) {
       console.error(error);
-      setLoginError("Error al iniciar sesión");
     }
   };
 

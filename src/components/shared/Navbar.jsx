@@ -32,10 +32,10 @@ export default function NavbarClinica() {
             <Nav.Link as={Link} to="">
               Inicio
             </Nav.Link>
-            <Nav.Link as={Link} to="*">
+            <Nav.Link as={Link} to="/servicios">
               Servicios
             </Nav.Link>
-            <Nav.Link as={Link} to="*">
+            <Nav.Link as={Link} to="/contacto">
               Contacto
             </Nav.Link>
 
