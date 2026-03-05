@@ -1,9 +1,9 @@
-﻿import { getUserIdFromToken } from "./login/apiLogin.js";
+﻿import { obtenerNombreDesdeToken } from "./login/apiLogin.js";
 
-const apiBase = import.meta.env.VITE_API_BASE || "http://localhost:3000/api";
+const apiBase = import.meta.env.VITE_API_BASE;
 const historialBackend =
   import.meta.env.VITE_API_HISTORIA_CLINICA || `${apiBase}/historial`;
-const pacienteIdEnv = import.meta.env.VITE_HISTORIAL_PACIENTE_ID || "";
+const pacienteIdEnv = import.meta.env.VITE_HISTORIAL_PACIENTE_ID;
 
 const requestJSON = async (url, options = {}) => {
   const response = await fetch(url, options);
@@ -17,7 +17,7 @@ const requestJSON = async (url, options = {}) => {
   return response.json();
 };
 
-const getPacienteId = () => getUserIdFromToken() || pacienteIdEnv;
+const getPacienteId = () => obtenerNombreDesdeToken() || pacienteIdEnv;
 
 const toBackendPayload = (historia = {}) => {
   const consultas = Array.isArray(historia.consultas) ? historia.consultas : [];

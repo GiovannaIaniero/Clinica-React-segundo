@@ -85,7 +85,6 @@ const Login = ({ onLogin }) => {
 
               <Form.Group className="mb-3" controlId="formBasicPassword">
                 <Form.Label>Contraseña:</Form.Label>
-
                 <InputGroup>
                   <Form.Control
                     type={showPassword ? "text" : "password"}

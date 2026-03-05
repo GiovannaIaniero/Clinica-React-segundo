@@ -1,4 +1,4 @@
-﻿const loginBackend = import.meta.env.VITE_API_LOGIN
+const loginBackend = import.meta.env.VITE_API_LOGIN;
 
 const decodeBase64Url = (value) => {
   const normalized = value.replace(/-/g, "+").replace(/_/g, "/");
@@ -18,17 +18,18 @@ const decodeTokenPayload = (token) => {
   }
 };
 
-export const login = async (email, contrase\u00f1a) => {
+export const login = async (email, contraseña) => {
   if (loginBackend) {
     try {
       const respuesta = await fetch(loginBackend, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, contrase\u00f1a }),
+        body: JSON.stringify({ email, contraseña }),
       });
 
       const raw = await respuesta.text();
       let data = null;
+
       try {
         data = raw ? JSON.parse(raw) : null;
       } catch {
@@ -36,36 +37,47 @@ export const login = async (email, contrase\u00f1a) => {
       }
 
       if (!respuesta.ok) {
-        throw new Error(data?.mensaje || raw );
+        throw new Error(data?.mensaje || raw);
       }
 
       if (data?.token) return data;
+
       if (data?.user?.role) {
         return {
           ...data,
           token: crearTokenLocal({ role: data.user.role, email }),
         };
       }
+
     } catch (error) {
       console.warn("Login por API no disponible, usando fallback local.", error);
     }
   }
 
-  return { error: " - Credenciales inv\u00e1lidas" };
+  return { error: " - Credenciales inválidas" };
 };
 
 export const getRoleFromToken = () => {
-  const payload = decodeTokenPayload(localStorage.getItem("token"));
-  return payload?.role || null;
+  const token = localStorage.getItem("token");
+  if (!token) return null;
+
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.role;
+  } catch (error) {
+    console.error("Error al decodificar el token:", error);
+    return null;
+  }
 };
 
 export const obtenerNombreDesdeToken = () => {
-  const payload = decodeTokenPayload(localStorage.getItem("token"));
-  return payload?.nombre_y_apellido || null;
-};
+  const token = localStorage.getItem("token");
+  if (!token) return null;
 
-export const getUserIdFromToken = () => {
-  const payload = decodeTokenPayload(localStorage.getItem("token"));
-  return payload?.id || null;
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.nombre_y_apellido || null;
+  } catch (error) {
+    return null;
+  }
 };
-

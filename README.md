@@ -1,16 +1,8 @@
-<<<<<<< HEAD
+
 # Bienestar360 - Clinica Medica
 Bienvenidos a nuestro proyecto del segundo modulo de programacion 
 Nuestro tema elegido para este proyecto fue Clinica Medica ⚕️
 
-## Integrantes 📚
-- Luana Jakubowicz **(SCRUM Master)**
-- Tomas Ponce **(Lider del Proyecto)**
-- Nicolas Lizarraga
-- Nahuel Nuñez
-- Miguel Zambrano
-
-<<<<<<< HEAD
 ## 📌 Descripción del proyecto
 Esta es una aplicación web para una clínica médica, desarrollada con React, que centraliza distintas funciones tanto para pacientes como para profesionales de la salud.
 El sistema busca mejorar la organización interna y ofrecer herramientas accesibles desde cualquier dispositivo.
@@ -44,7 +36,7 @@ El módulo de guardia médica permite:
 
 ## Link del deploy
 
-https://clinica-git-main-tomas-projects-affede4a.vercel.app/
+https://clinica-eight-beryl.vercel.app/
 
 ## 🔧 Instalación y ejecución
 
