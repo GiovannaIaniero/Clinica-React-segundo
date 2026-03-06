@@ -1,12 +1,13 @@
-export const validarTurnoDuplicado = (turnos, nuevoTurno, turnoEdit = null) => {
-  return turnos.some(t => {
-    if (turnoEdit && t._id === turnoEdit._id) return false;
+const validarTurnoDuplicado = (turnos, nuevoTurno, turnoEdit) => {
+  return turnos.some(turno => {
+    const mismoMedico = turno.medico === nuevoTurno.medico;
+    const mismaFecha = turno.fecha === nuevoTurno.fecha;
+    const mismaHora = turno.hora === nuevoTurno.hora;
 
-    return (
-      t.medicoId === nuevoTurno.medicoId &&
-      t.fecha === nuevoTurno.fecha &&
-      t.hora === nuevoTurno.hora
-    );
+    const noEsElMismoTurnoEditado =
+      !turnoEdit || turno._id !== turnoEdit._id;
+
+    return mismoMedico && mismaFecha && mismaHora && noEsElMismoTurnoEditado;
   });
 };
 

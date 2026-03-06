@@ -5,7 +5,7 @@ import CrearTurno from '../turnos/CrearTurno.jsx';
 import PaginacionTurnos from '../turnos/Paginacion.jsx';
 import Table from 'react-bootstrap/Table'
 import Swal from 'sweetalert2'
-import { useEffect} from "react";
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { getRoleFromToken } from '../../helpers/login/apiLogin.js';
 import { obtenerNombreDesdeToken } from '../../helpers/login/apiLogin.js';
@@ -245,13 +245,8 @@ const TurnosList = () => {
                 return turnoActualizado;
             }
         } catch (error) {
-            Swal.fire({
-                icon: "error",
-                title: "Error",
-                text: "Ocurrió un problema al guardar el turno"
-            });
-
             console.error(error);
+            throw error;   // 👈 esto faltaba
         }
     };
 
