@@ -116,8 +116,8 @@ const RegistroMedico = () => {
       setValue('nombre_y_apellido_medico', medicoSeleccionado.nombre_y_apellido_medico)
       setValue('especialidad', medicoSeleccionado.especialidad)
       setValue('email_medico', medicoSeleccionado.email_medico)
-      setValue('contraseña', medicoSeleccionado.contraseña)
-      setValue('contraseña_confirmar', medicoSeleccionado.contraseña)
+      setValue('contrasena', medicoSeleccionado.contrasena)
+      setValue('contrasena_confirmar', medicoSeleccionado.contrasena)
     }
   }
 
@@ -169,19 +169,19 @@ const RegistroMedico = () => {
 
           <Form.Group className="mb-3">
             <div className="containerLabelControl">
-              <Form.Label className="col-5 col-md-4">Nombre y Apellido</Form.Label>
+              <Form.Label className="col-5 col-md-4">Nombre</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Ej: Juan Perez"
-                {...register("nombre_y_apellido_medico", {
+                placeholder="Ej: Juan"
+                {...register("nombre_medico", {
                   required: "Este campo es obligatorio",
                   minLength: {
-                    value: 5,
-                    message: "Tienes que ingresar al menos cinco caracteres",
+                    value: 3,
+                    message: "Tienes que ingresar al menos tres caracteres",
                   },
                   maxLength: {
-                    value: 40,
-                    message: "No debes superar los treinta caracteres",
+                    value: 10,
+                    message: "No debes superar los diez caracteres",
                   },
                 })}
               />
@@ -190,6 +190,35 @@ const RegistroMedico = () => {
               {errors.nombre_y_apellido_medico?.message}
             </Form.Text>
           </Form.Group>
+
+
+          <Form.Group className="mb-3">
+            <div className="containerLabelControl">
+              <Form.Label className="col-5 col-md-4">Apellido</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Ej: Perez"
+                {...register("apellido_medico", {
+                  required: "Este campo es obligatorio",
+                  minLength: {
+                    value: 3,
+                    message: "Tienes que ingresar al menos tres caracteres",
+                  },
+                  maxLength: {
+                    value: 10,
+                    message: "No debes superar los diez caracteres",
+                  },
+                })}
+              />
+            </div>
+            <Form.Text className="text-danger">
+              {errors.nombre_y_apellido_medico?.message}
+            </Form.Text>
+          </Form.Group>
+
+
+
+
 
           <Form.Group className="mb-3">
             <div className="containerLabelControl">
@@ -233,7 +262,7 @@ const RegistroMedico = () => {
               <Form.Control
                 type="password"
                 placeholder="Ingresa la contraseña"
-                {...register("contraseña", {
+                {...register("contrasena", {
                   required: "Tienes que ingresar una contraseña"
                 })}
               />
@@ -246,10 +275,10 @@ const RegistroMedico = () => {
               <Form.Control
                 type="password"
                 placeholder="Repetir contraseña"
-                {...register("contraseña_confirmar", {
+                {...register("contrasena_confirmar", {
                   required: "Tienes que repetir la contraseña",
                   validate: (value) =>
-                    value === getValues('contraseña') || "Las contraseñas no coinciden"
+                    value === getValues('contrasena') || "Las contraseñas no coinciden"
                 })}
               />
             </div>
