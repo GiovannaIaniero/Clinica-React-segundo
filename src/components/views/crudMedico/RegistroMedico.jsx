@@ -4,21 +4,44 @@ import ListadoMedico from './ListadoMedico';
 import { useForm } from 'react-hook-form';
 import { useEffect, useState, useRef } from 'react';
 import Swal from "sweetalert2";
-import { FaUserMd } from 'react-icons/fa';
+import { FaUserMd, FaEye, FaEyeSlash } from 'react-icons/fa';
 import ModalDetalleMedico from './ModalDetalleMedico';
 import { crearDoctor, listarDoctores, editarDoctor, borrarDoctor } from "../../../helpers/registroDoctores/apiDoctores";
 
 const RegistroMedico = () => {
-
   const [estoyEditando, setEstoyEditando] = useState(false);
   const [medicoEditar, setMedicoEditar] = useState(null);
-
   const [mostrarModal, setMostrarModal] = useState(false);
   const [medicoSeleccionado, setMedicoSeleccionado] = useState(null);
   const [medicos, setMedicos] = useState([]);
 
+  const [verPassword, setVerPassword] = useState(false);
+  const [verConfirmarPassword, setVerConfirmarPassword] = useState(false);
 
   const formRef = useRef(null);
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+    getValues,
+    setValue,
+    setError
+  } = useForm({ mode: "onChange" });
+
+  useEffect(() => {
+    cargarDoctores();
+  }, []);
+
+  const cargarDoctores = async () => {
+    try {
+      const respuesta = await listarDoctores();
+      setMedicos(respuesta);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const verDetalleMedico = (medico) => {
     setMedicoSeleccionado(medico);
@@ -30,129 +53,74 @@ const RegistroMedico = () => {
     setMedicoSeleccionado(null);
   };
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-    getValues,
-    setValue
-  } = useForm();
-
-  useEffect(() => {
-    const cargarDoctores = async () => {
-      try {
-        const respuesta = await listarDoctores();
-        setMedicos(respuesta);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    cargarDoctores();
-  }, []);
-
   const crearYEditar = async (data) => {
     try {
-
       const { contrasena_confirmar, ...datosLimpios } = data;
-
 
       if (estoyEditando && (!datosLimpios.contrasena || datosLimpios.contrasena.trim() === "")) {
         delete datosLimpios.contrasena;
       }
 
       if (estoyEditando) {
-        const doctorActualizado = {
-          ...datosLimpios,
-          _id: medicoEditar,
-        };
-
+        const doctorActualizado = { ...datosLimpios, _id: medicoEditar };
         await editarDoctor(doctorActualizado);
-
-        Swal.fire({
-          title: "Medico Actualizado!",
-          text: `${data.nombre_medico} ${data.apellido_medico} ha sido modificado.`,
-          icon: "success",
-        });
-
+        Swal.fire({ title: "Médico Actualizado!", text: `${data.nombre_medico} ha sido modificado.`, icon: "success" });
       } else {
-        const nuevoMedico = {
-          ...datosLimpios,
-          role: "medico"
-        };
-
+        const nuevoMedico = { ...datosLimpios, role: "medico" };
         await crearDoctor(nuevoMedico);
-
-        Swal.fire({
-          title: "Medico registrado!",
-          text: `${data.nombre_medico} ${data.apellido_medico} esta habilitado.`,
-          icon: "success",
-        });
+        Swal.fire({ title: "Médico registrado!", text: `${data.nombre_medico} está habilitado.`, icon: "success" });
       }
 
       const listaActualizada = await listarDoctores();
       setMedicos(listaActualizada);
-
       setEstoyEditando(false);
       setMedicoEditar(null);
       reset();
-
     } catch (error) {
-      console.error(error);
-      // CORRECCIÓN: Feedback descriptivo capturando el mensaje del backend
-      const mensajeError = error.response?.data?.mensaje || "Ocurrio un problema. Intenta de nuevo.";
-
-      Swal.fire({
-        title: "Error",
-        text: mensajeError,
-        icon: "error",
-      });
+      console.error("Error capturado:", error);
+      const mensajeServidor = error.response?.data?.mensaje || "";
+      if (mensajeServidor.includes("email") || mensajeServidor.includes("registrado") || error.response?.status === 400) {
+        setError("email_medico", {
+          type: "manual",
+          message: "El E-mail ya está registrado."
+        });
+      } else {
+        Swal.fire({ title: "Error", text: "Revisa los datos ingresados.", icon: "error" });
+      }
     }
   };
-
   const modificarMedico = (id) => {
     const medico = medicos.find((m) => m._id === id);
-
     if (medico) {
       setEstoyEditando(true);
       setMedicoEditar(id);
-
       setValue('nombre_medico', medico.nombre_medico);
       setValue('apellido_medico', medico.apellido_medico);
       setValue('especialidad', medico.especialidad);
       setValue('email_medico', medico.email_medico);
       setValue('contrasena', '');
       setValue('contrasena_confirmar', '');
-
       formRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
   const borrarMedicoHandler = (medico) => {
     Swal.fire({
-      title: "Estas seguro?",
-      text: "Los datos no se podran recuperar!",
+      title: "¿Estás seguro?",
+      text: "¡Los datos no se podrán recuperar!",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Si, continuar",
+      confirmButtonText: "Sí, continuar",
       cancelButtonText: "Cancelar"
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
           await borrarDoctor(medico);
-          const listaActualizada = await listarDoctores();
-          setMedicos(listaActualizada);
-
-          Swal.fire({
-            title: "Medico Eliminado",
-            text: "El medico ha sido removido de la cartilla.",
-            icon: "success",
-          });
-        } catch (error) {
-          console.error(error);
-        }
+          cargarDoctores();
+          Swal.fire({ title: "Médico Eliminado", icon: "success" });
+        } catch (error) { console.error(error); }
       }
     });
   };
@@ -160,11 +128,7 @@ const RegistroMedico = () => {
   return (
     <>
       <div className="container col-12 col-md-8 col-lg-6" id="registroMedico" ref={formRef}>
-        <div>
-          <h1>
-            <FaUserMd /> {estoyEditando ? "Editar Medico" : "Registro Medico"}
-          </h1>
-        </div>
+        <h1 className="text-center mt-4"><FaUserMd /> {estoyEditando ? "Editar Médico" : "Registro Médico"}</h1>
 
         <Form className="mt-5" onSubmit={handleSubmit(crearYEditar)}>
 
@@ -178,14 +142,16 @@ const RegistroMedico = () => {
                 maxLength={15}
                 {...register("nombre_medico", {
                   required: "Este campo es obligatorio",
-                  minLength: { value: 3, message: "Minimo tres caracteres" },
-                  maxLength: { value: 15, message: "No debes superar los 15 caracteres" },
+                  minLength: { value: 3, message: "Mínimo tres caracteres" },
+                  maxLength: { value: 15, message: "Máximo 15 caracteres" },
+                  pattern: {
+                    value: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/,
+                    message: "El nombre solo puede contener letras"
+                  }
                 })}
               />
             </div>
-            <Form.Text className="text-danger">
-              {errors.nombre_medico?.message}
-            </Form.Text>
+            <Form.Text className="text-danger">{errors.nombre_medico?.message}</Form.Text>
           </Form.Group>
 
           {/* APELLIDO */}
@@ -198,35 +164,34 @@ const RegistroMedico = () => {
                 maxLength={15}
                 {...register("apellido_medico", {
                   required: "Este campo es obligatorio",
-                  minLength: { value: 3, message: "Minimo tres caracteres" },
-                  maxLength: { value: 15, message: "No debes superar los 15 caracteres" },
+                  minLength: { value: 3, message: "Mínimo tres caracteres" },
+                  maxLength: { value: 15, message: "Máximo 15 caracteres" },
+                  pattern: {
+                    value: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/,
+                    message: "El apellido solo puede contener letras"
+                  }
                 })}
               />
             </div>
-            <Form.Text className="text-danger">
-              {errors.apellido_medico?.message}
-            </Form.Text>
+            <Form.Text className="text-danger">{errors.apellido_medico?.message}</Form.Text>
           </Form.Group>
 
-          {/* ESPECIALIDAD */}
+        
           <Form.Group className="mb-3">
             <div className="containerLabelControl">
               <Form.Label className="col-5 col-md-4">Especialidad</Form.Label>
               <Form.Select {...register("especialidad", {
-                required: "Tienes que seleccionar una opcion",
-                validate: (value) => value !== "" || "Tienes que seleccionar una opcion"
+                required: "Tienes que seleccionar una opción"
               })}>
-                <option value="">Seleccione una opcion</option>
-                <option value="Clinica Gral">Clinica Gral</option>
-                <option value="Cirugia">Cirugia</option>
-                <option value="Gastroenterologia">Gastroenterologia</option>
-                <option value="Ginecologia">Ginecologia</option>
-                <option value="Oftalmologia">Oftalmologia</option>
+                <option value="">Seleccione una opción</option>
+                <option value="Clinica Gral">Clínica Gral</option>
+                <option value="Cirugia">Cirugía</option>
+                <option value="Gastroenterologia">Gastroenterología</option>
+                <option value="Ginecologia">Ginecología</option>
+                <option value="Oftalmologia">Oftalmología</option>
               </Form.Select>
             </div>
-            <Form.Text className="text-danger">
-              {errors.especialidad?.message}
-            </Form.Text>
+            <Form.Text className="text-danger">{errors.especialidad?.message}</Form.Text>
           </Form.Group>
 
           {/* EMAIL */}
@@ -240,95 +205,90 @@ const RegistroMedico = () => {
                 maxLength={40}
                 {...register("email_medico", {
                   required: "Este campo es obligatorio",
-                  maxLength: { value: 40, message: "Maximo 40 caracteres" },
                   pattern: {
                     value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                    message: "El email no es valido"
+                    message: "El email no es válido"
                   }
                 })}
               />
             </div>
-            <Form.Text className="text-danger">
-              {errors.email_medico?.message}
-            </Form.Text>
+            <Form.Text className="text-danger">{errors.email_medico?.message}</Form.Text>
           </Form.Group>
 
-          {/* CONTRASENA */}
-          {/* CONTRASENA */}
+          {/* CONTRASEÑA */}
           <Form.Group className="mb-3">
             <div className="containerLabelControl">
-              <Form.Label className="col-5 col-md-4">Contrasena</Form.Label>
-              <Form.Control
-                type="password"
-                placeholder={estoyEditando ? "Dejar vacio para no cambiar" : "Ingresa la contrasena"}
-                // Bloqueo físico: no permite escribir más de 10 caracteres
-                maxLength={10}
-                {...register("contrasena", {
-                  required: estoyEditando ? false : "Tienes que ingresar una contrasena",
-                  minLength: {
-                    value: 8,
-                    message: "La contrasena debe tener al menos 8 caracteres"
-                  },
-                  maxLength: {
-                    value: 10,
-                    message: "La contrasena no puede superar los 10 caracteres"
-                  },
-                  pattern: {
-                    value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/,
-                    message: "Debe incluir una mayúscula, una minúscula y un número"
-                  }
-                })}
-              />
+              <Form.Label className="col-5 col-md-4">Contraseña</Form.Label>
+              <div className="position-relative w-100">
+                <Form.Control
+                  type={verPassword ? "text" : "password"}
+                  maxLength={10}
+
+                  {...register("contrasena", {
+                    required: estoyEditando ? false : "La contraseña es obligatoria",
+                    minLength: { value: 4, message: "Mínimo 4 caracteres" },
+                    pattern: {
+                      value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/,
+                      message: "Falta Mayúscula, minúscula o número"
+                    }
+                  })}
+                />
+                <span
+                  className="position-absolute end-0 top-50 translate-middle-y me-3"
+                  onClick={() => setVerPassword(!verPassword)}
+                  style={{ cursor: 'pointer', zIndex: 10 }}
+                >
+                  {verPassword ? <FaEye /> : <FaEyeSlash />}
+                </span>
+              </div>
             </div>
-            <Form.Text className="text-danger">
-              {errors.contrasena?.message}
-            </Form.Text>
+            <Form.Text className="text-danger">{errors.contrasena?.message}</Form.Text>
           </Form.Group>
 
-          {/* CONFIRMAR CONTRASENA */}
-          {/* CONFIRMAR CONTRASENA */}
+          {/* CONFIRMAR CONTRASEÑA */}
           <Form.Group className="mb-3">
             <div className="containerLabelControl">
-              <Form.Label className="col-5 col-md-4">Confirmar Contrasena</Form.Label>
-              <Form.Control
-                type="password"
-                // Bloqueo físico: igual que el campo anterior
-                maxLength={10}
-                placeholder="Repetir contrasena"
-                {...register("contrasena_confirmar", {
-                  required: estoyEditando ? false : "Debes confirmar la contraseña",
-                  validate: (value) => {
-                    const contrasena = getValues('contrasena');
-                    // Si estamos editando y ambos están vacíos, es válido
-                    if (estoyEditando && !contrasena && !value) return true;
-                    // Si no, deben ser idénticos
-                    return value === contrasena || "Las contrasenas no coinciden";
-                  }
-                })}
-              />
+              <Form.Label className="col-5 col-md-4">Confirmar</Form.Label>
+              <div className="position-relative w-100">
+                <Form.Control
+                  type={verConfirmarPassword ? "text" : "password"}
+                  maxLength={10}
+
+                  {...register("contrasena_confirmar", {
+                    required: estoyEditando ? false : "Debes repetir la contraseña",
+                    validate: (value) => value === getValues('contrasena') || "Las contraseñas no coinciden"
+                  })}
+                />
+                <span
+                  className="position-absolute end-0 top-50 translate-middle-y me-3"
+                  onClick={() => setVerConfirmarPassword(!verConfirmarPassword)}
+                  style={{ cursor: 'pointer', zIndex: 10 }}
+                >
+                  {verConfirmarPassword ? <FaEye /> : <FaEyeSlash />}
+                </span>
+              </div>
             </div>
-            <Form.Text className="text-danger">
-              {errors.contrasena_confirmar?.message}
-            </Form.Text>
+            <Form.Text className="text-danger">{errors.contrasena_confirmar?.message}</Form.Text>
           </Form.Group>
 
-          <Button variant={estoyEditando ? "warning" : "success"} type="submit">
-            {estoyEditando ? "Guardar Cambios" : "Registrar"}
-          </Button>
-
-          {estoyEditando && (
-            <Button
-              variant="secondary"
-              className="ms-2"
-              onClick={() => {
-                setEstoyEditando(false);
-                setMedicoEditar(null);
-                reset();
-              }}
-            >
-              Cancelar
+          <div className="text-end">
+            <Button variant={estoyEditando ? "warning" : "success"} type="submit">
+              {estoyEditando ? "Guardar Cambios" : "Registrar"}
             </Button>
-          )}
+            {estoyEditando && (
+              <Button
+                variant="secondary"
+                className="ms-2"
+                onClick={() => {
+                  setEstoyEditando(false);
+                  setMedicoEditar(null);
+                  reset();
+                }}
+              >
+                Cancelar
+              </Button>
+            )}
+          </div>
         </Form>
       </div>
 
@@ -338,7 +298,6 @@ const RegistroMedico = () => {
         modificarMedico={modificarMedico}
         verDetalleMedico={verDetalleMedico}
       />
-
       <ModalDetalleMedico
         show={mostrarModal}
         handleClose={handleCloseModal}

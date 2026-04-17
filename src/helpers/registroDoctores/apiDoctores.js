@@ -1,6 +1,5 @@
 const doctoresBackend = import.meta.env.VITE_API_DOCTORES;
 
-// Crear
 export const crearDoctor = async (doctor) => {
   const respuesta = await fetch(doctoresBackend, {
     method: "POST",
@@ -8,8 +7,15 @@ export const crearDoctor = async (doctor) => {
     body: JSON.stringify(doctor),
   });
 
-  if (!respuesta.ok) throw new Error("Error al crear doctor");
-  return await respuesta.json();
+  const datos = await respuesta.json();
+
+  if (!respuesta.ok) {
+    const error = new Error(datos.mensaje || "Error al crear doctor");
+    error.response = { data: datos }; 
+    throw error;
+  }
+  
+  return datos;
 };
 
 // Listar
@@ -27,8 +33,15 @@ export const editarDoctor = async (doctor) => {
     body: JSON.stringify(doctor),
   });
 
-  if (!respuesta.ok) throw new Error("Error al editar doctor");
-  return await respuesta.json();
+  const datos = await respuesta.json();
+
+  if (!respuesta.ok) {
+    const error = new Error(datos.mensaje || "Error al editar doctor");
+    error.response = { data: datos };
+    throw error;
+  }
+  
+  return datos;
 };
 
 // Borrar
@@ -37,6 +50,11 @@ export const borrarDoctor = async (doctor) => {
     method: "DELETE",
   });
 
-  if (!respuesta.ok) throw new Error("Error al eliminar doctor");
+  if (!respuesta.ok) {
+    const datos = await respuesta.json();
+    const error = new Error(datos.mensaje || "Error al eliminar doctor");
+    throw error;
+  }
+  
   return true;
 };
