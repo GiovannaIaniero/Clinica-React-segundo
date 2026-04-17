@@ -1,8 +1,8 @@
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import ListadoMedico from './ListadoMedico'
+import ListadoMedico from './ListadoMedico';
 import { useForm } from 'react-hook-form';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Swal from "sweetalert2";
 import { FaUserMd } from 'react-icons/fa';
 import ModalDetalleMedico from './ModalDetalleMedico';
@@ -10,37 +10,35 @@ import { crearDoctor, listarDoctores, editarDoctor, borrarDoctor } from "../../.
 
 const RegistroMedico = () => {
 
-  /* EDITAR */
-  const [estoyEditando, setEstoyEditando] = useState(false)
-  const [medicoEditar, setMedicoEditar] = useState(null)  
+  const [estoyEditando, setEstoyEditando] = useState(false);
+  const [medicoEditar, setMedicoEditar] = useState(null);
 
-  /* VER */
   const [mostrarModal, setMostrarModal] = useState(false);
   const [medicoSeleccionado, setMedicoSeleccionado] = useState(null);
+  const [medicos, setMedicos] = useState([]);
 
-  const verDetalleMedico = (medico) =>{
+
+  const formRef = useRef(null);
+
+  const verDetalleMedico = (medico) => {
     setMedicoSeleccionado(medico);
-    setMostrarModal(true)
+    setMostrarModal(true);
   };
 
-  const handleCloseModal = () =>{
-    setMostrarModal(false)
-    setMedicoSeleccionado(null)
-  }
+  const handleCloseModal = () => {
+    setMostrarModal(false);
+    setMedicoSeleccionado(null);
+  };
 
   const {
     register,
     handleSubmit,
     reset,
-    formState:{errors},
+    formState: { errors },
     getValues,
     setValue
-  } = useForm()
+  } = useForm();
 
-  // 🔥 Ahora viene del backend
-  const [medicos, setMedicos] = useState([]);
-
-  // 🔥 Cargar doctores al iniciar
   useEffect(() => {
     const cargarDoctores = async () => {
       try {
@@ -53,43 +51,45 @@ const RegistroMedico = () => {
     cargarDoctores();
   }, []);
 
-  // Función principal que maneja CREAR y EDITAR
   const crearYEditar = async (data) => {
-
     try {
+    
+      const { contrasena_confirmar, ...datosLimpios } = data;
 
-      if(estoyEditando) {
 
+      if (estoyEditando && (!datosLimpios.contrasena || datosLimpios.contrasena.trim() === "")) {
+        delete datosLimpios.contrasena;
+      }
+
+      if (estoyEditando) {
         const doctorActualizado = {
-          ...data,
+          ...datosLimpios,
           _id: medicoEditar,
         };
 
         await editarDoctor(doctorActualizado);
 
         Swal.fire({
-          title: "Médico Actualizado!",
-          text: `${data.nombre_y_apellido_medico} ha sido modificado.`,
+          title: "Medico Actualizado!",
+          text: `${data.nombre_medico} ${data.apellido_medico} ha sido modificado.`,
           icon: "success",
         });
 
       } else {
-
         const nuevoMedico = {
-          ...data,
+          ...datosLimpios,
           role: "medico"
-        };  
+        };
 
         await crearDoctor(nuevoMedico);
 
         Swal.fire({
-          title: "Creaste un usuario!",
-          text: `${data.nombre_y_apellido_medico} esta habilitado.`,
+          title: "Medico registrado!",
+          text: `${data.nombre_medico} ${data.apellido_medico} esta habilitado.`,
           icon: "success",
         });
       }
 
-      // 🔥 Refrescar lista desde backend
       const listaActualizada = await listarDoctores();
       setMedicos(listaActualizada);
 
@@ -99,136 +99,123 @@ const RegistroMedico = () => {
 
     } catch (error) {
       console.error(error);
+      Swal.fire({
+        title: "Error",
+        text: "Ocurrio un problema. Intenta de nuevo.",
+        icon: "error",
+      });
     }
-  }
+  };
 
   const modificarMedico = (id) => {
+    const medico = medicos.find((m) => m._id === id);
 
-    const medicoSeleccionado = medicos.find(
-      (medico) => medico._id === id
-    );
-
-    if(medicoSeleccionado){
-
+    if (medico) {
       setEstoyEditando(true);
       setMedicoEditar(id);
 
-      setValue('nombre_y_apellido_medico', medicoSeleccionado.nombre_y_apellido_medico)
-      setValue('especialidad', medicoSeleccionado.especialidad)
-      setValue('email_medico', medicoSeleccionado.email_medico)
-      setValue('contrasena', medicoSeleccionado.contrasena)
-      setValue('contrasena_confirmar', medicoSeleccionado.contrasena)
+      setValue('nombre_medico', medico.nombre_medico);
+      setValue('apellido_medico', medico.apellido_medico);
+      setValue('especialidad', medico.especialidad);
+      setValue('email_medico', medico.email_medico);
+      setValue('contrasena', '');
+      setValue('contrasena_confirmar', '');
+
+      formRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
-  }
+  };
 
   const borrarMedicoHandler = (medico) => {
-
     Swal.fire({
       title: "Estas seguro?",
-      text: "Los datos no se podrán recuperar!",
+      text: "Los datos no se podran recuperar!",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Si, continuar"
-
+      confirmButtonText: "Si, continuar",
+      cancelButtonText: "Cancelar"
     }).then(async (result) => {
-
       if (result.isConfirmed) {
-
         try {
-
           await borrarDoctor(medico);
-
           const listaActualizada = await listarDoctores();
           setMedicos(listaActualizada);
 
           Swal.fire({
-            title: "Médico Eliminado",
-            text: "El médico ha sido removido de la cartilla.",
+            title: "Medico Eliminado",
+            text: "El medico ha sido removido de la cartilla.",
             icon: "success",
           });
-
         } catch (error) {
           console.error(error);
         }
       }
     });
-  }
+  };
 
   return (
     <>
-      <div className="container col-12 col-md-8 col-lg-6" id="registroMedico">
+      <div className="container col-12 col-md-8 col-lg-6" id="registroMedico" ref={formRef}>
         <div>
           <h1>
-            <FaUserMd /> {estoyEditando ? "Editar Médico" : "Registro Médico"}
+            <FaUserMd /> {estoyEditando ? "Editar Medico" : "Registro Medico"}
           </h1>
         </div>
 
         <Form className="mt-5" onSubmit={handleSubmit(crearYEditar)}>
 
+          {/* NOMBRE */}
           <Form.Group className="mb-3">
             <div className="containerLabelControl">
               <Form.Label className="col-5 col-md-4">Nombre</Form.Label>
               <Form.Control
                 type="text"
                 placeholder="Ej: Juan"
+                maxLength={15}
                 {...register("nombre_medico", {
                   required: "Este campo es obligatorio",
-                  minLength: {
-                    value: 3,
-                    message: "Tienes que ingresar al menos tres caracteres",
-                  },
-                  maxLength: {
-                    value: 10,
-                    message: "No debes superar los diez caracteres",
-                  },
+                  minLength: { value: 3, message: "Minimo tres caracteres" },
+                  maxLength: { value: 15, message: "No debes superar los 15 caracteres" },
                 })}
               />
             </div>
             <Form.Text className="text-danger">
-              {errors.nombre_y_apellido_medico?.message}
+              {errors.nombre_medico?.message}
             </Form.Text>
           </Form.Group>
 
-
+          {/* APELLIDO */}
           <Form.Group className="mb-3">
             <div className="containerLabelControl">
               <Form.Label className="col-5 col-md-4">Apellido</Form.Label>
               <Form.Control
                 type="text"
                 placeholder="Ej: Perez"
+                maxLength={15}
                 {...register("apellido_medico", {
                   required: "Este campo es obligatorio",
-                  minLength: {
-                    value: 3,
-                    message: "Tienes que ingresar al menos tres caracteres",
-                  },
-                  maxLength: {
-                    value: 10,
-                    message: "No debes superar los diez caracteres",
-                  },
+                  minLength: { value: 3, message: "Minimo tres caracteres" },
+                  maxLength: { value: 15, message: "No debes superar los 15 caracteres" },
                 })}
               />
             </div>
             <Form.Text className="text-danger">
-              {errors.nombre_y_apellido_medico?.message}
+              {errors.apellido_medico?.message}
             </Form.Text>
           </Form.Group>
 
-
-
-
-
+          {/* ESPECIALIDAD */}
           <Form.Group className="mb-3">
             <div className="containerLabelControl">
               <Form.Label className="col-5 col-md-4">Especialidad</Form.Label>
               <Form.Select {...register("especialidad", {
-                required:"Tienes que ingresar una opción"
+                required: "Tienes que seleccionar una opcion",
+                validate: (value) => value !== "" || "Tienes que seleccionar una opcion"
               })}>
-                <option value="">Seleccione una opción</option>
+                <option value="">Seleccione una opcion</option>
                 <option value="Clinica Gral">Clinica Gral</option>
-                <option value="Cirugía">Cirugia</option>
+                <option value="Cirugia">Cirugia</option>
                 <option value="Gastroenterologia">Gastroenterologia</option>
                 <option value="Ginecologia">Ginecologia</option>
                 <option value="Oftalmologia">Oftalmologia</option>
@@ -237,8 +224,9 @@ const RegistroMedico = () => {
             <Form.Text className="text-danger">
               {errors.especialidad?.message}
             </Form.Text>
-          </Form.Group>    
+          </Form.Group>
 
+          {/* EMAIL */}
           <Form.Group className="mb-3">
             <div className="containerLabelControl">
               <Form.Label className="col-5 col-md-4">E-mail</Form.Label>
@@ -246,8 +234,14 @@ const RegistroMedico = () => {
                 type="email"
                 placeholder="Ej: juanperez@gmail.com"
                 disabled={estoyEditando}
+                maxLength={40}
                 {...register("email_medico", {
-                  required: "Este campo es obligatorio"
+                  required: "Este campo es obligatorio",
+                  maxLength: { value: 40, message: "Maximo 40 caracteres" },
+                  pattern: {
+                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    message: "El email no es valido"
+                  }
                 })}
               />
             </div>
@@ -256,35 +250,52 @@ const RegistroMedico = () => {
             </Form.Text>
           </Form.Group>
 
+          {/* CONTRASENA */}
           <Form.Group className="mb-3">
             <div className="containerLabelControl">
-              <Form.Label className="col-5 col-md-4">Contraseña</Form.Label>
+              <Form.Label className="col-5 col-md-4">Contrasena</Form.Label>
               <Form.Control
                 type="password"
-                placeholder="Ingresa la contraseña"
+                maxLength={10}
+                placeholder={estoyEditando ? "Dejar vacio para no cambiar" : "Ingresa la contrasena"}
                 {...register("contrasena", {
-                  required: "Tienes que ingresar una contraseña"
+                  required: estoyEditando ? false : "Tienes que ingresar una contrasena",
+                  minLength: {
+                    value: 3,
+                    message: "La contrasena debe tener al menos 3 caracteres"
+                  },
+                  maxLength: { value: 10, message: "Maximo 10 caracteres" }
                 })}
               />
             </div>
+            <Form.Text className="text-danger">
+              {errors.contrasena?.message}
+            </Form.Text>
           </Form.Group>
 
+          {/* CONFIRMAR CONTRASENA */}
           <Form.Group className="mb-3">
             <div className="containerLabelControl">
-              <Form.Label className="col-5 col-md-4">Confirmar Contraseña</Form.Label>
+              <Form.Label className="col-5 col-md-4">Confirmar Contrasena</Form.Label>
               <Form.Control
                 type="password"
-                placeholder="Repetir contraseña"
+                maxLength={10}
+                placeholder="Repetir contrasena"
                 {...register("contrasena_confirmar", {
-                  required: "Tienes que repetir la contraseña",
-                  validate: (value) =>
-                    value === getValues('contrasena') || "Las contraseñas no coinciden"
+                  validate: (value) => {
+                    const contrasena = getValues('contrasena');
+                    if (!contrasena) return true;
+                    return value === contrasena || "Las contrasenas no coinciden";
+                  }
                 })}
               />
             </div>
+            <Form.Text className="text-danger">
+              {errors.contrasena_confirmar?.message}
+            </Form.Text>
           </Form.Group>
 
-          <Button variant={estoyEditando? "warning" : "success"} type="submit">
+          <Button variant={estoyEditando ? "warning" : "success"} type="submit">
             {estoyEditando ? "Guardar Cambios" : "Registrar"}
           </Button>
 
@@ -293,9 +304,9 @@ const RegistroMedico = () => {
               variant="secondary"
               className="ms-2"
               onClick={() => {
-                setEstoyEditando(false)
-                setMedicoEditar(null)
-                reset()
+                setEstoyEditando(false);
+                setMedicoEditar(null);
+                reset();
               }}
             >
               Cancelar
@@ -317,7 +328,7 @@ const RegistroMedico = () => {
         medico={medicoSeleccionado}
       />
     </>
-  )
-}
+  );
+};
 
-export default RegistroMedico
+export default RegistroMedico;
