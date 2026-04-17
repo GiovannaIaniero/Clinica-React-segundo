@@ -53,7 +53,7 @@ const RegistroMedico = () => {
 
   const crearYEditar = async (data) => {
     try {
-    
+
       const { contrasena_confirmar, ...datosLimpios } = data;
 
 
@@ -99,9 +99,12 @@ const RegistroMedico = () => {
 
     } catch (error) {
       console.error(error);
+      // CORRECCIÓN: Feedback descriptivo capturando el mensaje del backend
+      const mensajeError = error.response?.data?.mensaje || "Ocurrio un problema. Intenta de nuevo.";
+
       Swal.fire({
         title: "Error",
-        text: "Ocurrio un problema. Intenta de nuevo.",
+        text: mensajeError,
         icon: "error",
       });
     }
@@ -251,20 +254,29 @@ const RegistroMedico = () => {
           </Form.Group>
 
           {/* CONTRASENA */}
+          {/* CONTRASENA */}
           <Form.Group className="mb-3">
             <div className="containerLabelControl">
               <Form.Label className="col-5 col-md-4">Contrasena</Form.Label>
               <Form.Control
                 type="password"
-                maxLength={10}
                 placeholder={estoyEditando ? "Dejar vacio para no cambiar" : "Ingresa la contrasena"}
+                // Bloqueo físico: no permite escribir más de 10 caracteres
+                maxLength={10}
                 {...register("contrasena", {
                   required: estoyEditando ? false : "Tienes que ingresar una contrasena",
                   minLength: {
-                    value: 3,
-                    message: "La contrasena debe tener al menos 3 caracteres"
+                    value: 8,
+                    message: "La contrasena debe tener al menos 8 caracteres"
                   },
-                  maxLength: { value: 10, message: "Maximo 10 caracteres" }
+                  maxLength: {
+                    value: 10,
+                    message: "La contrasena no puede superar los 10 caracteres"
+                  },
+                  pattern: {
+                    value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/,
+                    message: "Debe incluir una mayúscula, una minúscula y un número"
+                  }
                 })}
               />
             </div>
@@ -274,17 +286,22 @@ const RegistroMedico = () => {
           </Form.Group>
 
           {/* CONFIRMAR CONTRASENA */}
+          {/* CONFIRMAR CONTRASENA */}
           <Form.Group className="mb-3">
             <div className="containerLabelControl">
               <Form.Label className="col-5 col-md-4">Confirmar Contrasena</Form.Label>
               <Form.Control
                 type="password"
+                // Bloqueo físico: igual que el campo anterior
                 maxLength={10}
                 placeholder="Repetir contrasena"
                 {...register("contrasena_confirmar", {
+                  required: estoyEditando ? false : "Debes confirmar la contraseña",
                   validate: (value) => {
                     const contrasena = getValues('contrasena');
-                    if (!contrasena) return true;
+                    // Si estamos editando y ambos están vacíos, es válido
+                    if (estoyEditando && !contrasena && !value) return true;
+                    // Si no, deben ser idénticos
                     return value === contrasena || "Las contrasenas no coinciden";
                   }
                 })}
